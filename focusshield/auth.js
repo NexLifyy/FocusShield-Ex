@@ -111,5 +111,23 @@ const authService = {
     await new Promise((resolve) => {
       chrome.storage.local.remove(['sessionUser'], resolve);
     });
+  },
+
+  async updateName(fullName) {
+    const user = await this.getCurrentUser();
+    if (!user) throw new Error('User not signed in.');
+
+    if (supabaseClient) {
+      const { data, error } = await supabaseClient.auth.updateUser({
+        data: { full_name: fullName }
+      });
+      if (error) throw error;
+    }
+
+    user.fullName = fullName;
+    await new Promise((resolve) => {
+      chrome.storage.local.set({ sessionUser: user }, resolve);
+    });
+    return user;
   }
 };

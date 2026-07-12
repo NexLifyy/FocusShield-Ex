@@ -2777,6 +2777,66 @@ document.addEventListener('DOMContentLoaded', () => {
       
       const emailEl = document.getElementById('account-email');
       if (emailEl) emailEl.textContent = user.fullName || user.email;
+
+      // Bind Edit Name button once
+      const btnEditName = document.getElementById('btn-edit-name');
+      if (btnEditName && !btnEditName.dataset.bound) {
+        btnEditName.dataset.bound = 'true';
+        btnEditName.addEventListener('click', () => {
+          const nameContainer = document.getElementById('account-name-container');
+          if (!nameContainer) return;
+          
+          const currentText = emailEl.textContent;
+          const isEmail = currentText.includes('@');
+          const defaultVal = isEmail ? '' : currentText;
+          
+          nameContainer.innerHTML = `
+            <input type="text" id="input-edit-name" value="${defaultVal.replace(/"/g, '&quot;')}" placeholder="Enter your name" style="flex: 1; min-width: 0; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 4px 8px; color: #fff; font-size: 12px; font-family: inherit; height: 26px; box-sizing: border-box;">
+            <button type="button" id="btn-save-name" style="background: rgba(61,220,132,0.15); border: 1px solid rgba(61,220,132,0.25); color: var(--accent); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; height: 26px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;">Save</button>
+            <button type="button" id="btn-cancel-name" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-3); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; height: 26px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;">Cancel</button>
+          `;
+          
+          const inputName = document.getElementById('input-edit-name');
+          const btnSave = document.getElementById('btn-save-name');
+          const btnCancel = document.getElementById('btn-cancel-name');
+          
+          if (inputName) inputName.focus();
+          
+          const restoreContainer = () => {
+            nameContainer.innerHTML = `
+              <span id="account-email" style="font-size: 13.5px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${emailEl.textContent}</span>
+              <button type="button" id="btn-edit-name" style="background: none; border: none; padding: 2px; color: var(--text-3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: color 0.2s; flex-shrink: 0;" title="Edit Name">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"/></svg>
+              </button>
+            `;
+            updateAccountUI();
+          };
+          
+          if (btnCancel) {
+            btnCancel.addEventListener('click', restoreContainer);
+          }
+          
+          if (btnSave) {
+            btnSave.addEventListener('click', async () => {
+              const newName = inputName.value.trim();
+              if (newName.length === 0) return;
+              
+              btnSave.textContent = 'Saving…';
+              btnSave.disabled = true;
+              
+              try {
+                await authService.updateName(newName);
+                emailEl.textContent = newName;
+                restoreContainer();
+              } catch (err) {
+                alert('Failed to update name: ' + err.message);
+                btnSave.textContent = 'Save';
+                btnSave.disabled = false;
+              }
+            });
+          }
+        });
+      }
       
       const badge = document.getElementById('account-badge');
       if (badge) {

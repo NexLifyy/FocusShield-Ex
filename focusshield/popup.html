@@ -662,9 +662,14 @@
             <!-- Profile Info Card (Visible when signed in) -->
             <div id="account-logged-in-card" class="card" style="padding: 20px 16px; display: none; flex-direction: column; gap: 14px;">
               <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 12px;">
-                <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; padding-right: 8px;">
                   <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-3); font-weight: 600;">Signed In As</span>
-                  <span id="account-email" style="font-size: 13.5px; font-weight: 700; color: var(--text);">user@example.com</span>
+                  <div id="account-name-container" style="display: flex; align-items: center; gap: 6px; width: 100%;">
+                    <span id="account-email" style="font-size: 13.5px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">user@example.com</span>
+                    <button type="button" id="btn-edit-name" style="background: none; border: none; padding: 2px; color: var(--text-3); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: color 0.2s; flex-shrink: 0;" title="Edit Name">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"/></svg>
+                    </button>
+                  </div>
                 </div>
                 <span id="account-badge" class="challenge-type-badge" style="margin-bottom: 0;">Free Tier</span>
               </div>

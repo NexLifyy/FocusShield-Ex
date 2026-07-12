@@ -2152,6 +2152,21 @@
       chrome.storage.local.get(null, (result) => {
         refreshCurrentSettings(result);
       });
+
+      // Sync session changes back to the website if page is open (for name updates or signouts)
+      if (changes.sessionUser) {
+        const syncHost = window.location.hostname.toLowerCase();
+        if (syncHost.includes('getfocusshield.site') || syncHost.includes('localhost') || syncHost.includes('127.0.0.1')) {
+          try {
+            const newUser = changes.sessionUser.newValue;
+            if (newUser) {
+              localStorage.setItem('focusshield_mock_session', JSON.stringify(newUser));
+            } else {
+              localStorage.removeItem('focusshield_mock_session');
+            }
+          } catch (e) {}
+        }
+      }
     }
   });
 
