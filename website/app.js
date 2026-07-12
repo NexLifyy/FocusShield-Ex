@@ -150,6 +150,31 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = 'index.html';
     },
 
+    async updateName(fullName) {
+      const user = this.getCurrentUser();
+      if (!user) throw new Error('User not logged in.');
+
+      if (supabaseClient) {
+        const { data, error } = await supabaseClient.auth.updateUser({
+          data: { full_name: fullName }
+        });
+        if (error) throw error;
+      }
+
+      user.fullName = fullName;
+      localStorage.setItem('focusshield_mock_session', JSON.stringify(user));
+      this.broadcastSession(user);
+
+      // Update mock list
+      const users = this.getUsers();
+      const userIdx = users.findIndex(u => u.email === user.email);
+      if (userIdx !== -1) {
+        users[userIdx].fullName = fullName;
+        this.saveUsers(users);
+      }
+      return user;
+    },
+
     async upgradeToPremium(customEmail = null) {
       const user = this.getCurrentUser();
       const emailTarget = customEmail || (user ? user.email : null);
