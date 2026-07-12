@@ -93,6 +93,15 @@
       border-radius: 14px;
       overflow: hidden;
       box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 462px;
+    }
+    .browser-frame-scaler {
+      width: 900px;
+      flex-shrink: 0;
+      transform-origin: center center;
     }
     .browser-bar {
       height: 42px;
@@ -394,7 +403,19 @@
       border-radius: 20px;
       padding: 28px;
       position: relative;
-      overflow: visible;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 380px;
+      max-width: 440px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .feature-visual-scaler {
+      width: 384px;
+      flex-shrink: 0;
+      transform-origin: center center;
     }
 
     .feature-visual-glow {
@@ -663,6 +684,38 @@
     }
 
     /* Responsive overrides */
+    @media (max-width: 920px) {
+      .browser-frame-scaler { transform: scale(0.8); }
+      .browser-frame { height: 370px; }
+    }
+    @media (max-width: 768px) {
+      .browser-frame-scaler { transform: scale(0.65); }
+      .browser-frame { height: 300px; margin-bottom: 30px; }
+    }
+    @media (max-width: 600px) {
+      .browser-frame-scaler { transform: scale(0.5); }
+      .browser-frame { height: 231px; }
+      .hero-cta-row { flex-direction: column; align-items: center; }
+    }
+    @media (max-width: 485px) {
+      .browser-frame-scaler { transform: scale(0.38); }
+      .browser-frame { height: 175px; }
+      .feature-visual-scaler { transform: scale(0.85); }
+      .feature-visual { height: 323px; padding: 16px; }
+    }
+    @media (max-width: 400px) {
+      .browser-frame-scaler { transform: scale(0.32); }
+      .browser-frame { height: 148px; }
+      .feature-visual-scaler { transform: scale(0.72); }
+      .feature-visual { height: 273px; padding: 12px; }
+    }
+    @media (max-width: 350px) {
+      .browser-frame-scaler { transform: scale(0.28); }
+      .browser-frame { height: 130px; }
+      .feature-visual-scaler { transform: scale(0.62); }
+      .feature-visual { height: 235px; padding: 8px; }
+    }
+
     @media (max-width: 900px) {
       .feature-row { grid-template-columns: 1fr; gap: 40px; }
       .feature-row.flip { direction: ltr; }
@@ -676,9 +729,6 @@
       .cta-banner h2 { font-size: 30px; }
       .proof-strip-inner { gap: 28px; }
       .proof-divider { display: none; }
-    }
-    @media (max-width: 600px) {
-      .hero-cta-row { flex-direction: column; align-items: center; }
     }
   </style>
 </head>
@@ -753,7 +803,8 @@
 
         <!-- Browser Mockup -->
         <div class="browser-frame">
-          <div class="browser-bar">
+          <div class="browser-frame-scaler">
+            <div class="browser-bar">
             <div class="browser-dots">
               <div class="browser-dot" style="background:#ef4444;"></div>
               <div class="browser-dot" style="background:#f59e0b;"></div>
@@ -894,6 +945,7 @@
           </div>
         </div>
       </div>
+      </div>
     </div>
 
     <div id="features" style="text-align: center; padding: 20px 24px 20px; max-width: 800px; margin: 0 auto;">
@@ -928,8 +980,7 @@
           </div>
           <div class="feature-visual">
             <div class="feature-visual-glow"></div>
-
-            <!-- Extension Popup UI -->
+            <div class="feature-visual-scaler">
 
               <!-- Current Site Section -->
               <div style="padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);">
@@ -987,7 +1038,7 @@
                   </div>
 
               </div>
-
+            </div>
           </div>
         </div>
       </div>
@@ -1017,7 +1068,8 @@
 
           <div class="feature-visual">
             <div class="feature-visual-glow"></div>
-            <div style="display: flex; gap: 12px; width: 100%; align-items: stretch;">
+            <div class="feature-visual-scaler">
+              <div style="display: flex; gap: 12px; width: 100%; align-items: stretch;">
               
               <!-- Card 1: Platforms Toggle List -->
               <div style="flex: 1; min-width: 0; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">
@@ -1185,10 +1237,10 @@
                   Block Full Site
                 </button>
               </div>
-
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       <!-- Feature 3: Smart Filters -->
@@ -1215,9 +1267,8 @@
           </div>
           <div class="feature-visual">
             <div class="feature-visual-glow" style="background: radial-gradient(circle, rgba(251,191,36,0.07) 0%, transparent 70%);"></div>
-
-            <!-- Extension-style filter list card -->
-            <div style="display: flex; flex-direction: column;">
+            <div class="feature-visual-scaler">
+              <div style="display: flex; flex-direction: column;">
 
                 <!-- Adult & NSFW -->
                 <div style="display:flex; align-items:center; justify-content:space-between; padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -1313,9 +1364,9 @@
                 </div>
 
             </div>
-
           </div>
         </div>
+      </div>
       </div>
 
       <!-- Feature 4: Schedules -->
@@ -1342,9 +1393,7 @@
           </div>
           <div class="feature-visual">
             <div class="feature-visual-glow" style="background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);"></div>
-
-            <!-- Extension-style Active Schedules card -->
-
+            <div class="feature-visual-scaler">
               <!-- Header -->
               <div style="padding: 14px 18px 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280;">Active Schedules</div>
@@ -1411,9 +1460,9 @@
                 </div>
 
             </div>
-
           </div>
         </div>
+      </div>
       </div>
 
       <!-- Feature 5: Analytics -->
@@ -1438,11 +1487,10 @@
               </li>
             </ul>
           </div>
-          <div class="feature-visual" style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="feature-visual">
             <div class="feature-visual-glow"></div>
-            <!-- Extension Analytics UI Replica -->
-
-            <!-- Filter Bar -->
+            <div class="feature-visual-scaler" style="display: flex; flex-direction: column; gap: 16px;">
+              <!-- Filter Bar -->
             <div style="display: flex; gap: 4px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 3px;">
               <div style="flex: 1; background: rgba(255,255,255,0.08); color: #3ddc84; font-size: 11px; font-weight: 700; padding: 6px 0; border-radius: 8px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.15);">Daily</div>
               <div style="flex: 1; color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 600; padding: 6px 0; border-radius: 8px; text-align: center;">Weekly</div>
@@ -1528,8 +1576,8 @@
               </div>
             </div>
           </div>
-          </div>
         </div>
+      </div>
       </div>
 
     </div>
