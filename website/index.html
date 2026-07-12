@@ -1710,18 +1710,32 @@
   <script src="app.js"></script>
   <script>
     // Interactive popup tabs
-    document.getElementById('btn-social').addEventListener('click', function() {
-      this.classList.add('active');
-      document.getElementById('btn-filters').classList.remove('active');
-      document.getElementById('mock-social-view').style.display = 'block';
-      document.getElementById('mock-filter-view').style.display = 'none';
-    });
-    document.getElementById('btn-filters').addEventListener('click', function() {
-      this.classList.add('active');
-      document.getElementById('btn-social').classList.remove('active');
-      document.getElementById('mock-social-view').style.display = 'none';
-      document.getElementById('mock-filter-view').style.display = 'block';
-    });
+    const btnSocial = document.getElementById('btn-social');
+    const btnFilters = document.getElementById('btn-filters');
+
+    if (btnSocial) {
+      btnSocial.addEventListener('click', function() {
+        this.classList.add('active');
+        const btnF = document.getElementById('btn-filters');
+        if (btnF) btnF.classList.remove('active');
+        const mockSocial = document.getElementById('mock-social-view');
+        const mockFilter = document.getElementById('mock-filter-view');
+        if (mockSocial) mockSocial.style.display = 'block';
+        if (mockFilter) mockFilter.style.display = 'none';
+      });
+    }
+
+    if (btnFilters) {
+      btnFilters.addEventListener('click', function() {
+        this.classList.add('active');
+        const btnS = document.getElementById('btn-social');
+        if (btnS) btnS.classList.remove('active');
+        const mockSocial = document.getElementById('mock-social-view');
+        const mockFilter = document.getElementById('mock-filter-view');
+        if (mockSocial) mockSocial.style.display = 'none';
+        if (mockFilter) mockFilter.style.display = 'block';
+      });
+    }
 
     // FAQ accordion
     document.querySelectorAll('.faq-question').forEach(q => {
