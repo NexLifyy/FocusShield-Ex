@@ -1,8 +1,5 @@
-// Initialize Supabase Client
-let syncSupabaseClient = null;
-if (typeof supabase !== 'undefined' && FOCUSSHIELD_CONFIG.useLiveCloudDb) {
-  syncSupabaseClient = supabase.createClient(FOCUSSHIELD_CONFIG.supabaseUrl, FOCUSSHIELD_CONFIG.supabaseAnonKey);
-}
+// Reuse global Supabase Client initialized in auth.js to avoid duplicate instances warnings
+let syncSupabaseClient = typeof supabaseClient !== 'undefined' ? supabaseClient : null;
 
 const syncService = {
   // Sync local data to cloud database
