@@ -411,10 +411,16 @@
       width: 100%;
       margin: 0 auto;
     }
-    .visual-single-col {
+    .visual-standard-col {
+      max-width: 440px;
+    }
+    .visual-standard-col .feature-visual-scaler {
+      width: 384px;
+    }
+    .visual-narrow-col {
       max-width: 360px;
     }
-    .visual-single-col .feature-visual-scaler {
+    .visual-narrow-col .feature-visual-scaler {
       width: 304px;
     }
     .visual-double-col {
@@ -711,8 +717,11 @@
       .browser-frame-scaler { transform: scale(0.38); }
       .browser-frame { height: 175px; }
       
-      .visual-single-col .feature-visual-scaler { transform: scale(0.85); }
-      .visual-single-col { height: 323px; padding: 16px; }
+      .visual-standard-col .feature-visual-scaler { transform: scale(0.85); }
+      .visual-standard-col { height: 323px; padding: 16px; }
+      
+      .visual-narrow-col .feature-visual-scaler { transform: scale(0.85); }
+      .visual-narrow-col { height: 323px; padding: 16px; }
       
       .visual-double-col .feature-visual-scaler { transform: scale(0.68); }
       .visual-double-col { height: 323px; padding: 16px; }
@@ -721,8 +730,11 @@
       .browser-frame-scaler { transform: scale(0.32); }
       .browser-frame { height: 148px; }
       
-      .visual-single-col .feature-visual-scaler { transform: scale(0.72); }
-      .visual-single-col { height: 273px; padding: 12px; }
+      .visual-standard-col .feature-visual-scaler { transform: scale(0.72); }
+      .visual-standard-col { height: 273px; padding: 12px; }
+      
+      .visual-narrow-col .feature-visual-scaler { transform: scale(0.72); }
+      .visual-narrow-col { height: 273px; padding: 12px; }
       
       .visual-double-col .feature-visual-scaler { transform: scale(0.58); }
       .visual-double-col { height: 273px; padding: 12px; }
@@ -731,8 +743,11 @@
       .browser-frame-scaler { transform: scale(0.28); }
       .browser-frame { height: 130px; }
       
-      .visual-single-col .feature-visual-scaler { transform: scale(0.62); }
-      .visual-single-col { height: 235px; padding: 8px; }
+      .visual-standard-col .feature-visual-scaler { transform: scale(0.62); }
+      .visual-standard-col { height: 235px; padding: 8px; }
+      
+      .visual-narrow-col .feature-visual-scaler { transform: scale(0.62); }
+      .visual-narrow-col { height: 235px; padding: 8px; }
       
       .visual-double-col .feature-visual-scaler { transform: scale(0.5); }
       .visual-double-col { height: 235px; padding: 8px; }
@@ -1000,7 +1015,7 @@
               </li>
             </ul>
           </div>
-          <div class="feature-visual visual-single-col">
+          <div class="feature-visual visual-standard-col">
             <div class="feature-visual-glow"></div>
             <div class="feature-visual-scaler">
 
@@ -1287,7 +1302,7 @@
               </li>
             </ul>
           </div>
-          <div class="feature-visual visual-single-col">
+          <div class="feature-visual visual-standard-col">
             <div class="feature-visual-glow" style="background: radial-gradient(circle, rgba(251,191,36,0.07) 0%, transparent 70%);"></div>
             <div class="feature-visual-scaler">
               <div style="display: flex; flex-direction: column;">
@@ -1413,7 +1428,7 @@
               </li>
             </ul>
           </div>
-          <div class="feature-visual visual-single-col">
+          <div class="feature-visual visual-narrow-col">
             <div class="feature-visual-glow" style="background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);"></div>
             <div class="feature-visual-scaler">
               <!-- Header -->
@@ -1509,7 +1524,7 @@
               </li>
             </ul>
           </div>
-          <div class="feature-visual visual-single-col">
+          <div class="feature-visual visual-standard-col">
             <div class="feature-visual-glow"></div>
             <div class="feature-visual-scaler" style="display: flex; flex-direction: column; gap: 16px;">
               <!-- Filter Bar -->
