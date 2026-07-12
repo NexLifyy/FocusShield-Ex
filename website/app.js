@@ -77,11 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
           isConfirmed: isConfirmed
         };
         
-        // Only set session if the account is confirmed
-        if (isConfirmed) {
-          localStorage.setItem('focusshield_mock_session', JSON.stringify(newUser));
-          this.broadcastSession(newUser);
-        }
+        // Never auto-login on signup
         return newUser;
       } else {
         // Fallback to Mock
@@ -100,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         users.push(newUser);
         this.saveUsers(users);
-        this.login(email, password);
+        // Never auto-login on signup
         return newUser;
       }
     },
