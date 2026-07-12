@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Account Dashboard — FocusShield</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="icons/icon128.png" width="22" height="22" alt="FocusShield Logo"><span>FocusShield</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#features">Features</a></li>
+        <li><a href="index.html#how-it-works">How It Works</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="nav-login">Login</a>
+        <a href="signup.html" class="nav-signup">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- User Account Panel -->
+  <main class="account-container" style="flex:1;">
+    <div class="account-header-row">
+      <h1 style="font-family: var(--font-headings); font-weight: 800; font-size: 32px; letter-spacing: -1px;">Account Settings</h1>
+      <button onclick="window.authEngine.logout()" class="btn btn-secondary">Logout</button>
+    </div>
+
+    <!-- Profile card -->
+    <div class="account-user-card">
+      <div id="user-avatar" class="avatar-large">U</div>
+      <div style="display:flex; flex-direction:column; gap:4px; flex: 1;">
+        <h3 id="user-email-header" style="font-family: var(--font-headings); font-size: 20px; font-weight: 700; margin:0;">name@example.com</h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span id="user-plan-badge" style="font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; letter-spacing: 0.05em; background:rgba(255,255,255,0.06); color:var(--text-secondary); border: 1px solid rgba(255,255,255,0.1);">Free Plan</span>
+          <span id="sync-status-indicator" style="font-size: 11px; color: var(--text-muted);">Sync active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Promo Banner for Free users -->
+    <div id="account-promo-banner" style="display:none; align-items:center; justify-content:space-between; padding:20px; background:linear-gradient(135deg, rgba(61,220,132,0.08) 0%, rgba(56,189,248,0.05) 100%); border:1.5px dashed rgba(61,220,132,0.25); border-radius:var(--radius-lg); margin-bottom:24px; box-sizing:border-box;">
+      <div style="display:flex; flex-direction:column; gap:4px; max-width:70%;">
+        <h4 style="font-family:var(--font-headings); font-size:18px; font-weight:700; color:#fff;">Get FocusShield Pro</h4>
+        <p style="font-size:13px; color:var(--text-secondary); margin:0;">Unlock secure cloud settings backup, unlimited website blocks, custom automatic schedules, and long-term focus audit trends.</p>
+      </div>
+      <a href="pricing.html" class="btn btn-primary" style="padding:10px 20px; color:#000;">Upgrade Now</a>
+    </div>
+
+    <!-- Premium dashboard features (Cloud backup details) -->
+    <div class="card" style="padding: 28px; margin-bottom: 24px; display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:14px;">
+        <h3 style="font-family: var(--font-headings); font-size: 18px; font-weight: 700; margin:0;">Cloud Synchronization</h3>
+        <span style="font-size:11.5px; color:var(--text-muted);" id="last-sync-time">Last Synced: Just now</span>
+      </div>
+      
+      <!-- Sync details -->
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; font-size:13.5px;">
+          <span style="color:var(--text-secondary);">Blocked Websites Backed Up</span>
+          <span style="font-weight:700; color:#fff;" id="sync-websites-count">2 Websites</span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; font-size:13.5px;">
+          <span style="color:var(--text-secondary);">Focus Schedules Backed Up</span>
+          <span style="font-weight:700; color:#fff;" id="sync-schedules-count">1 Schedule</span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; font-size:13.5px;">
+          <span style="color:var(--text-secondary);">Focus Streaks Data</span>
+          <span style="font-weight:700; color:#fff;">Active Workspaces (Chrome)</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:12px; margin-top:8px;">
+        <button id="btn-force-sync" class="btn btn-sky" style="font-size:12.5px;">Force Sync Now</button>
+        <button id="btn-delete-backup" class="btn btn-secondary" style="font-size:12.5px; color:var(--danger); border-color:rgba(239,68,68,0.2);">Clear Cloud Backup</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="logo"><img src="icons/icon128.png" width="20" height="20" alt="FocusShield Logo"><span>FocusShield</span></a>
+          <p class="footer-brand-tagline">Block distractions. Build deep focus.<br>Your best work starts here.</p>
+        </div>
+        <nav class="footer-nav">
+          <div class="footer-nav-group">
+            <div class="footer-nav-label">Product</div>
+            <a href="index.html#features" class="footer-nav-link">Features</a>
+            <a href="index.html#how-it-works" class="footer-nav-link">How It Works</a>
+            <a href="pricing.html" class="footer-nav-link">Pricing</a>
+          </div>
+          <div class="footer-nav-group">
+            <div class="footer-nav-label">Legal</div>
+            <a href="terms.html" class="footer-nav-link">Terms of Service</a>
+            <a href="privacy.html" class="footer-nav-link">Privacy Policy</a>
+            <a href="refund.html" class="footer-nav-link">Refund Policy</a>
+          </div>
+          <div class="footer-nav-group">
+            <div class="footer-nav-label">Account</div>
+            <a href="login.html" class="footer-nav-link">Login</a>
+            <a href="signup.html" class="footer-nav-link">Sign Up</a>
+          </div>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2026 FocusShield. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = JSON.parse(localStorage.getItem('focusshield_mock_session') || 'null');
+      if (!user) {
+        // Force redirect to login page if no active user session exists
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Update UI elements based on User details
+      const userEmailHeader = document.getElementById('user-email-header');
+      const userAvatar = document.getElementById('user-avatar');
+      const userPlanBadge = document.getElementById('user-plan-badge');
+      const promoBanner = document.getElementById('account-promo-banner');
+      const syncStatus = document.getElementById('sync-status-indicator');
+      const websitesCount = document.getElementById('sync-websites-count');
+      const schedulesCount = document.getElementById('sync-schedules-count');
+      const lastSync = document.getElementById('last-sync-time');
+
+      userEmailHeader.textContent = user.email;
+      userAvatar.textContent = user.email.charAt(0).toUpperCase();
+
+      if (user.isPremium) {
+        userPlanBadge.textContent = 'Pro Plan';
+        userPlanBadge.style.background = 'rgba(61,220,132,0.1)';
+        userPlanBadge.style.color = 'var(--accent)';
+        userPlanBadge.style.borderColor = 'rgba(61,220,132,0.2)';
+        
+        promoBanner.style.display = 'none';
+        syncStatus.textContent = 'Automatic cloud backup active';
+        websitesCount.textContent = '12 Websites';
+        schedulesCount.textContent = '8 Schedules';
+      } else {
+        userPlanBadge.textContent = 'Free Plan';
+        userPlanBadge.style.background = 'rgba(255,255,255,0.06)';
+        userPlanBadge.style.color = 'var(--text-secondary)';
+        userPlanBadge.style.borderColor = 'rgba(255,255,255,0.1)';
+        
+        promoBanner.style.display = 'flex';
+        syncStatus.textContent = 'Cloud backup unavailable (Free)';
+        websitesCount.textContent = '2 Websites (Limit)';
+        schedulesCount.textContent = 'None';
+      }
+
+      // Sync button events
+      document.getElementById('btn-force-sync').addEventListener('click', () => {
+        if (!user.isPremium) {
+          alert("Cloud Sync is a premium feature. Please upgrade to Pro to backup automatically.");
+          return;
+        }
+        lastSync.textContent = "Last Synced: Syncing...";
+        setTimeout(() => {
+          const now = new Date();
+          lastSync.textContent = "Last Synced: Today at " + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          alert("Settings synchronized successfully across all connected workspaces!");
+        }, 1200);
+      });
+
+      document.getElementById('btn-delete-backup').addEventListener('click', () => {
+        if (confirm("Are you sure you want to delete your settings cloud backup? This cannot be undone.")) {
+          alert("Cloud sync backup deleted successfully.");
+          websitesCount.textContent = "0 Websites";
+          schedulesCount.textContent = "0 Schedules";
+          lastSync.textContent = "Last Synced: Never";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

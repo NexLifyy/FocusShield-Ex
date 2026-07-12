@@ -1,9 +1,21 @@
 // FocusShield Content Script - High Performance CSS Injection Method
 (function () {
+  function checkPremium(settings) {
+    if (!settings) return false;
+    if (settings.sessionUser && settings.sessionUser.isPremium) {
+      return true;
+    }
+    const install = settings.installDate || Date.now();
+    if (Date.now() - install < 7 * 24 * 60 * 60 * 1000) {
+      return true;
+    }
+    return false;
+  }
+
   const defaultSettings = {
     masterToggle: true,
     youtube: {
-      enabled: true,
+      enabled: false,
       blockFullSite: false,
       sidebar: true,
       comments: true,
@@ -12,7 +24,7 @@
       autoplay: true
     },
     facebook: {
-      enabled: true,
+      enabled: false,
       blockFullSite: false,
       feed: true,
       stories: true,
@@ -25,7 +37,7 @@
       pages: true
     },
     instagram: {
-      enabled: true,
+      enabled: false,
       blockFullSite: false,
       feed: true,
       reels: true,
@@ -38,7 +50,7 @@
       comments: true
     },
     reddit: {
-      enabled: true,
+      enabled: false,
       blockFullSite: false,
       promoted: true,
       communities: true,
@@ -50,7 +62,7 @@
       chatDMs: true
     },
     tiktok: {
-      enabled: true,
+      enabled: false,
       blockFullSite: false,
       foryou: true,
       following: true,
@@ -63,7 +75,7 @@
       upload: true
     },
     twitter: {
-      enabled: true,
+      enabled: false,
       blockFullSite: false,
       trending: true,
       whotofollow: true,
@@ -76,7 +88,16 @@
       premium: true,
       feed: true
     },
-    customSites: []
+    customSites: [],
+    hardBlockedSites: [],
+    schedules: [],
+    iconBadgeEnabled: true,
+    filterAdult: false,
+    filterGaming: false,
+    filterShopping: false,
+    filterGambling: false,
+    filterStreaming: false,
+    filterBypasses: {}
   };
 
   function mergeWithDefaults(stored) {
@@ -90,8 +111,19 @@
         }
       });
       if (Array.isArray(stored.customSites)) merged.customSites = stored.customSites;
+      if (Array.isArray(stored.hardBlockedSites)) merged.hardBlockedSites = stored.hardBlockedSites;
+      if (Array.isArray(stored.schedules)) merged.schedules = stored.schedules;
       if (stored.previousPlatformStates) merged.previousPlatformStates = stored.previousPlatformStates;
       if (stored.previousCustomSiteStates) merged.previousCustomSiteStates = stored.previousCustomSiteStates;
+      if (stored.iconBadgeEnabled !== undefined) merged.iconBadgeEnabled = stored.iconBadgeEnabled;
+      if (stored.filterAdult !== undefined) merged.filterAdult = stored.filterAdult;
+      if (stored.filterGaming !== undefined) merged.filterGaming = stored.filterGaming;
+      if (stored.filterShopping !== undefined) merged.filterShopping = stored.filterShopping;
+      if (stored.filterGambling !== undefined) merged.filterGambling = stored.filterGambling;
+      if (stored.filterStreaming !== undefined) merged.filterStreaming = stored.filterStreaming;
+      if (stored.filterBypasses && typeof stored.filterBypasses === 'object') {
+        merged.filterBypasses = stored.filterBypasses;
+      }
     }
     return merged;
   }
@@ -225,13 +257,25 @@
     if (!settings || !settings.masterToggle) return;
 
     const platform = getPlatform(hostname);
-    if (platform && settings[platform] && settings[platform].blockFullSite === true) {
-      const blockedUrl = chrome.runtime.getURL('blocked.html') 
-        + '?site=' + encodeURIComponent(window.location.hostname)
-        + '&returnUrl=' + encodeURIComponent(document.referrer || '')
-        + '&originalUrl=' + encodeURIComponent(window.location.href);
-      window.location.href = blockedUrl;
-      return;
+    const isPremium = checkPremium(settings);
+    if (platform && settings[platform] && settings[platform].enabled !== false) {
+      const isFullSiteBlock = settings[platform].blockFullSite === true;
+      if (isFullSiteBlock) {
+        const hardList = settings.hardBlockedSites || [];
+        let hardEntry = hardList.find(s => s.domain.toLowerCase().includes(platform) || hostname.toLowerCase().includes(s.domain.toLowerCase()));
+        if (!hardEntry && !isPremium) {
+          hardEntry = { expiresAt: 9999999999999 };
+        }
+        if (hardEntry && Date.now() < hardEntry.expiresAt) {
+          const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
+            + '?site=' + encodeURIComponent(window.location.hostname)
+            + '&expiresAt=' + encodeURIComponent(hardEntry.expiresAt)
+            + '&returnUrl=' + encodeURIComponent(document.referrer || '')
+            + '&originalUrl=' + encodeURIComponent(window.location.href);
+          window.location.href = blockedUrl;
+          return;
+        }
+      }
     }
 
     // 1. YouTube checks (Autoplay disabler & Shorts blocker)
@@ -866,6 +910,7 @@
   }
 
   function generateCSS(settings) {
+    if (!settings) return '';
     const selectors = [];
     const hostname = window.location.hostname;
     const platform = getPlatform(hostname);
@@ -1559,7 +1604,242 @@
     if (style) style.remove();
   }
 
+  function isScheduleActive(sched) {
+    if (!sched.enabled) return false;
+    const now = new Date();
+    const currentDay = now.getDay(); // 0-6 (0=Sunday)
+    if (!sched.days.includes(currentDay)) return false;
+
+    const [startH, startM] = sched.startTime.split(':').map(Number);
+    const [endH, endM] = sched.endTime.split(':').map(Number);
+
+    const startMinutes = startH * 60 + startM;
+    const endMinutes = endH * 60 + endM;
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    if (startMinutes <= endMinutes) {
+      return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+    } else {
+      return currentMinutes >= startMinutes || currentMinutes < endMinutes;
+    }
+  }
+
+  const CATEGORIES_DB = {
+    Adult: {
+      domains: ['pornhub.com', 'xvideos.com', 'xnxx.com', 'xhamster.com', 'onlyfans.com', 'redtube.com', 'youporn.com', 'chaturbate.com', 'tube8.com', 'stripchat.com', 'livejasmin.com', 'bongacams.com'],
+      keywords: ['/porn/', '/nsfw/', '/xx/', 'pornography', 'xxx-site']
+    },
+    Gaming: {
+      domains: ['twitch.tv', 'roblox.com', 'steamcommunity.com', 'steampowered.com', 'epicgames.com', 'itch.io', 'poki.com', 'crazygames.com', 'armorgames.com', 'ign.com', 'kotaku.com', 'miniclip.com', 'kongregate.com', 'polygon.com', 'gamerant.com', 'eurogamer.net'],
+      keywords: ['/play/', '/game/', '/games/']
+    },
+    Shopping: {
+      domains: ['amazon.com', 'amazon.co.uk', 'amazon.ca', 'amazon.de', 'amazon.fr', 'amazon.it', 'amazon.es', 'amazon.co.jp', 'amazon.in', 'ebay.com', 'ebay.co.uk', 'aliexpress.com', 'alibaba.com', 'etsy.com', 'target.com', 'walmart.com', 'bestbuy.com', 'shopify.com', 'ikea.com', 'zara.com', 'h&m.com', 'asos.com', 'shein.com', 'temu.com'],
+      keywords: ['/shop/', '/store/', '/checkout/', '/cart/']
+    },
+    Gambling: {
+      domains: ['bet365.com', 'bwin.com', '888casino.com', 'betonline.ag', 'draftkings.com', 'fanduel.com', 'pokerstars.com', 'stake.com', 'roobet.com', 'betfair.com', 'williamhill.com', 'ladbrokes.com', 'betway.com', 'jackpot.com', 'lottery.com'],
+      keywords: ['/casino/', '/betting/', '/gamble/', '/poker/', '/jackpot/', '/slots/']
+    },
+    Streaming: {
+      domains: ['netflix.com', 'hulu.com', 'disneyplus.com', 'max.com', 'hbo.com', 'vimeo.com', 'dailymotion.com', 'crunchyroll.com', 'primevideo.com', 'peacocktv.com', 'paramountplus.com', 'tubitv.com', 'pluto.tv'],
+      keywords: ['/watch/', '/video/', '/videos/', '/movie/', '/movies/']
+    }
+  };
+
+  function getMatchingCategory(hostname, path, settings) {
+    if (!settings) return null;
+    
+    const categoryMapping = {
+      Adult: settings.filterAdult === true,
+      Gaming: settings.filterGaming === true,
+      Shopping: settings.filterShopping === true,
+      Gambling: settings.filterGambling === true,
+      Streaming: settings.filterStreaming === true
+    };
+
+    const cleanHost = hostname.toLowerCase().replace(/^www\./, '');
+    const cleanPath = path.toLowerCase();
+
+    for (const [category, enabled] of Object.entries(categoryMapping)) {
+      if (!enabled) continue;
+      
+      const db = CATEGORIES_DB[category];
+      if (!db) continue;
+
+      const matchDomain = db.domains.some(d => cleanHost === d || cleanHost.endsWith('.' + d));
+      if (matchDomain) {
+        return category;
+      }
+
+      const matchKeyword = db.keywords.some(kw => cleanPath.includes(kw));
+      if (matchKeyword) {
+        return category;
+      }
+    }
+
+    return null;
+  }
+
+  function recordCategoryBlockInStats(categoryName, domain) {
+    const nowTime = Date.now();
+    const cleanDomain = domain.toLowerCase().replace(/^www\./, '');
+
+    chrome.storage.local.get(['focusStats', 'lastBlockEvent'], (result) => {
+      // Prevent duplicate block counts within a 5-second window (e.g. page redirects)
+      const lastEvent = result.lastBlockEvent || {};
+      if (lastEvent.domain === cleanDomain && (nowTime - lastEvent.timestamp) < 5000) {
+        console.log(`Deduplicated block count for ${cleanDomain}`);
+        return;
+      }
+
+      // Update the last block event timestamp
+      const newEvent = { domain: cleanDomain, timestamp: nowTime };
+      chrome.storage.local.set({ lastBlockEvent: newEvent });
+
+      let stats = result.focusStats || {
+        streakDays: 0,
+        lastActiveDate: '',
+        totalSessionsCompleted: 0,
+        timeSavedMinutes: 0,
+        siteBlockCounts: {},
+        dailyLogs: {},
+        dailyFocusGoal: 4
+      };
+
+      stats.totalSessionsCompleted = (stats.totalSessionsCompleted || 0) + 1;
+      
+      const minsSaved = 5;
+      stats.timeSavedMinutes = (stats.timeSavedMinutes || 0) + minsSaved;
+
+      const chartKey = `[${categoryName}]`;
+      if (!stats.siteBlockCounts) stats.siteBlockCounts = {};
+      stats.siteBlockCounts[chartKey] = (stats.siteBlockCounts[chartKey] || 0) + 1;
+
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      if (!stats.dailyLogs) stats.dailyLogs = {};
+      if (!stats.dailyLogs[todayStr]) {
+        stats.dailyLogs[todayStr] = {
+          sessions: 0,
+          minutes: 0,
+          siteCounts: {}
+        };
+      }
+      const log = stats.dailyLogs[todayStr];
+      log.sessions = (log.sessions || 0) + 1;
+      log.minutes = (log.minutes || 0) + minsSaved;
+      if (!log.siteCounts) log.siteCounts = {};
+      log.siteCounts[chartKey] = (log.siteCounts[chartKey] || 0) + 1;
+
+      if (stats.lastActiveDate !== todayStr) {
+        if (stats.lastActiveDate) {
+          const lastDate = new Date(stats.lastActiveDate);
+          const diffTime = now.getTime() - lastDate.getTime();
+          const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+          if (diffDays === 1) {
+            stats.streakDays = (stats.streakDays || 0) + 1;
+          } else if (diffDays > 1) {
+            stats.streakDays = 1;
+          }
+        } else {
+          stats.streakDays = 1;
+        }
+        stats.lastActiveDate = todayStr;
+      }
+
+      chrome.storage.local.set({ focusStats: stats });
+    });
+  }
+
   function applyBlocking(settings) {
+    // ── HARD BLOCK CHECK (highest priority — runs before masterToggle) ──
+    const hardBlockedSites = (settings && settings.hardBlockedSites) || [];
+    const currentHostname  = window.location.hostname.toLowerCase().replace(/^www\./, '');
+
+    const hardEntry = hardBlockedSites.find(s => {
+      const d = s.domain.toLowerCase().replace(/^www\./, '');
+      return currentHostname === d || currentHostname.endsWith('.' + d);
+    });
+
+    if (hardEntry) {
+      if (Date.now() < hardEntry.expiresAt) {
+        // Active hard block — redirect to hard-blocked.html
+        const hardUrl = chrome.runtime.getURL('hard-blocked.html')
+          + '?site='        + encodeURIComponent(window.location.hostname)
+          + '&expiresAt='   + encodeURIComponent(hardEntry.expiresAt)
+          + '&originalUrl=' + encodeURIComponent(window.location.href);
+        window.location.href = hardUrl;
+        return;
+      } else {
+        // Expired — silently auto-remove from storage
+        chrome.storage.local.get('hardBlockedSites', (r) => {
+          const updated = (r.hardBlockedSites || []).filter(
+            s => s.domain.toLowerCase().replace(/^www\./, '') !== hardEntry.domain.toLowerCase().replace(/^www\./, '')
+          );
+          chrome.storage.local.set({ hardBlockedSites: updated });
+        });
+      }
+    }
+    // ── END HARD BLOCK CHECK ────────────────────────────────────────────
+
+    // ── SCHEDULE BLOCK CHECK ──
+    const schedules = (settings && settings.schedules) || [];
+    const activeSchedule = schedules.find(sched => {
+      if (!sched.enabled) return false;
+      const d = sched.domain.toLowerCase().replace(/^www\./, '');
+      const matches = currentHostname === d || currentHostname.endsWith('.' + d);
+      return matches && isScheduleActive(sched);
+    });
+
+    if (activeSchedule) {
+      const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
+        + '?site=' + encodeURIComponent(window.location.hostname)
+        + '&type=schedule'
+        + '&startTime=' + encodeURIComponent(activeSchedule.startTime)
+        + '&endTime=' + encodeURIComponent(activeSchedule.endTime)
+        + '&days=' + encodeURIComponent(activeSchedule.days.join(','))
+        + '&returnUrl=' + encodeURIComponent(document.referrer || '')
+        + '&originalUrl=' + encodeURIComponent(window.location.href);
+      window.location.href = blockedUrl;
+      return;
+    }
+    // ── END SCHEDULE BLOCK CHECK ──
+
+    // ── CATEGORY FILTER BLOCK CHECK ──
+    if (settings && settings.masterToggle !== false) {
+      const path = window.location.pathname;
+      const matchedCategory = getMatchingCategory(window.location.hostname, path, settings);
+      
+      if (matchedCategory) {
+        const bypasses = settings.filterBypasses || {};
+        const bypassExpiry = bypasses[currentHostname] || 0;
+        
+        if (Date.now() >= bypassExpiry) {
+          const displayNameMap = {
+            Adult: 'Adult & NSFW',
+            Gaming: 'Gaming & Esports',
+            Shopping: 'Shopping & E-Commerce',
+            Gambling: 'Gambling & Betting',
+            Streaming: 'Streaming & Entertainment'
+          };
+          const categoryName = displayNameMap[matchedCategory] || matchedCategory;
+          
+          const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
+            + '?site=' + encodeURIComponent(categoryName)
+            + '&type=filter'
+            + '&domain=' + encodeURIComponent(currentHostname)
+            + '&returnUrl=' + encodeURIComponent(document.referrer || '')
+            + '&originalUrl=' + encodeURIComponent(window.location.href);
+          
+          recordCategoryBlockInStats(categoryName, currentHostname);
+          window.location.href = blockedUrl;
+          return;
+        }
+      }
+    }
+    // ── END CATEGORY FILTER BLOCK CHECK ──
+
     runPlatformBackgroundChecks(settings);
 
     if (!settings || !settings.masterToggle) {
@@ -1572,7 +1852,7 @@
 
     if (platform) {
       if (settings[platform] && settings[platform].blockFullSite === true) {
-        const blockedUrl = chrome.runtime.getURL('blocked.html') 
+        const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
           + '?site=' + encodeURIComponent(window.location.hostname)
           + '&returnUrl=' + encodeURIComponent(document.referrer || '')
           + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1585,7 +1865,7 @@
         // Direct page load check for Shorts on YouTube
         if (platform === 'youtube' && settings.youtube && settings.youtube.shorts) {
           if (window.location.pathname.startsWith('/shorts')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=youtube.com/shorts'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1598,7 +1878,7 @@
         if (platform === 'facebook' && settings.facebook) {
           const fb = settings.facebook;
           if (fb.reels && (window.location.pathname.startsWith('/reels') || window.location.pathname.startsWith('/reel'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/reels'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1606,7 +1886,7 @@
             return;
           }
           if (fb.messenger && window.location.pathname.startsWith('/messages')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/messages'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1614,7 +1894,7 @@
             return;
           }
           if (fb.messenger && hostname.includes('messenger.com')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=messenger.com'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1622,7 +1902,7 @@
             return;
           }
           if (fb.friends && (window.location.pathname.startsWith('/friends') || window.location.pathname.startsWith('/friends/'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/friends'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1630,7 +1910,7 @@
             return;
           }
           if (fb.groups && (window.location.pathname.startsWith('/groups') || window.location.pathname.startsWith('/groups/'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/groups'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1638,7 +1918,7 @@
             return;
           }
           if (fb.pages && (window.location.pathname.startsWith('/pages') || window.location.pathname.startsWith('/pages/'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/pages'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1651,7 +1931,7 @@
         if (platform === 'twitter' && settings.twitter) {
           const tw = settings.twitter;
           if (tw.messages && (window.location.pathname.startsWith('/messages') || window.location.pathname.startsWith('/chat'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=x.com/messages'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1664,7 +1944,7 @@
                                     window.location.pathname.includes('/trends') || 
                                     window.location.pathname.startsWith('/i/trends');
           if ((tw.explore || tw.feed) && isExploreOrSearch) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=x.com/explore'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1682,7 +1962,7 @@
             document.documentElement.setAttribute('data-fs-ig-home', 'true');
           }
           if (ig.reels && (path.startsWith('/reels') || path.startsWith('/reel'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/reels'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1690,7 +1970,7 @@
             return;
           }
           if (ig.explore && path.startsWith('/explore')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/explore'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1698,7 +1978,7 @@
             return;
           }
           if (ig.shopping && (path.startsWith('/shop') || path.startsWith('/shopping'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/shop'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1706,7 +1986,7 @@
             return;
           }
           if (ig.messages && path.startsWith('/direct')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/direct'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1714,7 +1994,7 @@
             return;
           }
           if (ig.stories && path.startsWith('/stories')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/stories'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1754,7 +2034,7 @@
             if (isAll) label = 'reddit.com/r/all';
             else if (isNews) label = 'reddit.com/news';
             else if (isExplore) label = 'reddit.com/explore';
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=' + encodeURIComponent(label)
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1773,7 +2053,7 @@
           const path = window.location.pathname.toLowerCase();
           
           if (tt.foryou && (path === '/' || path === '/foryou' || path === '/recommend' || path === '/explore')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/foryou'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1781,7 +2061,7 @@
             return;
           }
           if (tt.following && path.startsWith('/following')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/following'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1789,7 +2069,7 @@
             return;
           }
           if (tt.live && path.startsWith('/live')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/live'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1797,7 +2077,7 @@
             return;
           }
           if (tt.shop && path.startsWith('/shop')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/shop'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1805,7 +2085,7 @@
             return;
           }
           if (tt.search && path.startsWith('/search')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/search'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1813,7 +2093,7 @@
             return;
           }
           if (tt.upload && path.startsWith('/upload')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/upload'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
@@ -1829,16 +2109,24 @@
       }
     } else {
       // Check custom sites list
-      const isCustomSite = settings.customSites && settings.customSites.some(site => {
-        if (site.enabled === false) return false;
-        const domain = site.domain.toLowerCase();
-        return hostname === domain || hostname.endsWith('.' + domain);
+      const targetHost = hostname.replace(/^www\./, '').toLowerCase();
+      const hardSites = settings.hardBlockedSites || [];
+      const hardEntry = hardSites.find(s => {
+        const d = s.domain.toLowerCase().replace(/^www\./, '');
+        return targetHost === d || targetHost.endsWith('.' + d);
       });
 
-      if (isCustomSite) {
-        // Redirect custom sites to blocked.html page
-        const blockedUrl = chrome.runtime.getURL('blocked.html') 
+      const isCustomSite = settings.customSites && settings.customSites.some(site => {
+        if (site.enabled === false) return false;
+        const domain = site.domain.toLowerCase().replace(/^www\./, '');
+        return targetHost === domain || targetHost.endsWith('.' + domain);
+      });
+
+      if (isCustomSite && hardEntry && Date.now() < hardEntry.expiresAt) {
+        // Redirect custom sites to hard-blocked.html page only when active hard block exists
+        const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
           + '?site=' + encodeURIComponent(window.location.hostname)
+          + '&expiresAt=' + encodeURIComponent(hardEntry.expiresAt)
           + '&returnUrl=' + encodeURIComponent(document.referrer || '')
           + '&originalUrl=' + encodeURIComponent(window.location.href);
         window.location.href = blockedUrl;
@@ -1846,18 +2134,32 @@
     }
   }
 
+  let currentSettings = null;
+
+  function refreshCurrentSettings(rawSettings) {
+    currentSettings = mergeWithDefaults(rawSettings);
+    applyBlocking(currentSettings);
+  }
+
   // ON PAGE LOAD: Get settings and apply immediately
   chrome.storage.local.get(null, (result) => {
-    const merged = mergeWithDefaults(result);
-    applyBlocking(merged);
+    refreshCurrentSettings(result);
+  });
+
+  // STORAGE CHANGE LISTENER: Keep content script settings up to date
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'local') {
+      chrome.storage.local.get(null, (result) => {
+        refreshCurrentSettings(result);
+      });
+    }
   });
 
   // MESSAGE LISTENER: Listen for settings changes from popup
   chrome.runtime.onMessage.addListener(
     (message, sender, sendResponse) => {
       if (message.type === 'SETTINGS_UPDATED') {
-        const merged = mergeWithDefaults(message.settings);
-        applyBlocking(merged);
+        refreshCurrentSettings(message.settings);
       }
       if (message.type === 'MASTER_OFF') {
         removeCSS();
@@ -1865,5 +2167,29 @@
       }
     }
   );
+
+  // REAL-TIME SCHEDULE AUTO-REDIRECT: Checks every 2s if current time enters an active schedule
+  setInterval(() => {
+    if (!currentSettings || !currentSettings.schedules || currentSettings.schedules.length === 0) return;
+    const currentHostname = window.location.hostname.toLowerCase().replace(/^www\./, '');
+    const activeSchedule = currentSettings.schedules.find(sched => {
+      if (!sched.enabled) return false;
+      const d = sched.domain.toLowerCase().replace(/^www\./, '');
+      const matches = currentHostname === d || currentHostname.endsWith('.' + d);
+      return matches && isScheduleActive(sched);
+    });
+
+    if (activeSchedule) {
+      const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
+        + '?site=' + encodeURIComponent(window.location.hostname)
+        + '&type=schedule'
+        + '&startTime=' + encodeURIComponent(activeSchedule.startTime)
+        + '&endTime=' + encodeURIComponent(activeSchedule.endTime)
+        + '&days=' + encodeURIComponent(activeSchedule.days.join(','))
+        + '&returnUrl=' + encodeURIComponent(document.referrer || '')
+        + '&originalUrl=' + encodeURIComponent(window.location.href);
+      window.location.href = blockedUrl;
+    }
+  }, 2000);
 
 })();

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — FocusShield</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="icons/icon128.png" width="22" height="22" alt="FocusShield Logo"><span>FocusShield</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#features">Features</a></li>
+        <li><a href="index.html#how-it-works">How It Works</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="nav-login">Login</a>
+        <a href="signup.html" class="nav-signup">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Privacy Document Content -->
+  <main class="legal-container">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <h1 class="legal-title">Legal Documents</h1>
+      <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Read our terms, privacy commitments, and refund policies.</p>
+    </div>
+
+    <!-- Switcher Tabs -->
+    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 40px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 4px; border-radius: var(--radius-md); max-width: 500px; margin-left: auto; margin-right: auto;">
+      <a href="terms.html" class="legal-tab" style="flex: 1; text-align: center; padding: 10px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; text-decoration: none; transition: var(--transition);">Terms of Service</a>
+      <a href="privacy.html" class="legal-tab active" style="flex: 1; text-align: center; padding: 10px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; text-decoration: none; transition: var(--transition);">Privacy Policy</a>
+      <a href="refund.html" class="legal-tab" style="flex: 1; text-align: center; padding: 10px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; text-decoration: none; transition: var(--transition);">Refund Policy</a>
+    </div>
+
+    <!-- Document Card -->
+    <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-lg); padding: 48px 40px; box-shadow: var(--shadow); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
+      <h2 style="font-family: var(--font-headings); font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 8px; line-height: 1.2;">Privacy Policy</h2>
+      <p class="legal-meta">Last Updated: July 12, 2026</p>
+
+      <div class="legal-content" style="margin-top: 24px;">
+        <h2>1. Introduction</h2>
+        <p>Your privacy is of utmost importance to us. FocusShield ("we", "us", "Service") is committed to protecting the privacy of our extension users. This Privacy Policy details how we handle information inside our local extension state and cloud sync services.</p>
+
+        <h2>2. Information We Collect</h2>
+        <ul>
+          <li><strong>Local Extension Settings:</strong> All configured blocked websites, block schedules, and browsing analytics metrics are processed and stored locally on your device inside your browser's local sandbox (using `chrome.storage.local`).</li>
+          <li><strong>Account Registration Information:</strong> If you register a FocusShield account to use cloud synchronization, we collect your email address.</li>
+          <li><strong>Cloud Sync Backups:</strong> If you use the Pro Plan, your configured blocked site domains, custom schedule variables, and workspace metrics are uploaded securely to our cloud database. We never record your active passwords (which are hashed) or browse history logs.</li>
+          <li><strong>Payment Processing:</strong> Billing addresses and credit card details are handled directly by our secure merchant processor, Paddle. FocusShield does not store billing credentials on our servers.</li>
+        </ul>
+
+        <h2>3. How We Use Information</h2>
+        <p>We use your email address to authenticate you, deliver security notifications, and verify subscription status. Backups are strictly used to sync settings across your installations. We never sell, rent, or distribute user list details to third parties.</p>
+
+        <h2>4. Data Retention</h2>
+        <p>Your local configuration remains inside your Chrome profile until you uninstall the extension. Cloud sync databases retain your backed-up settings as long as your account is active. You can delete your cloud settings backup or delete your account permanently via the settings panel at any time.</p>
+
+        <h2>5. Browser Extension Permissions</h2>
+        <p>FocusShield requires specific API permissions to operate:</p>
+        <ul>
+          <li>`declarativeNetRequest` / `webNavigation`: Used to monitor site requests and block access to configured domains. We do not track websites outside your blocked list.</li>
+          <li>`storage`: Used to persist configurations locally.</li>
+          <li>`alarms`: Used to run schedule background timers.</li>
+        </ul>
+
+        <h2>6. Security</h2>
+        <p>We implement industry-standard database encryptions to protect your cloud backups. However, no database transmission over the internet is completely secure. Please protect your account credentials.</p>
+
+        <h2>7. Children's Privacy</h2>
+        <p>The Service is not directed to children under 13 years of age. We do not knowingly compile personal details of minors.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="logo"><img src="icons/icon128.png" width="20" height="20" alt="FocusShield Logo"><span>FocusShield</span></a>
+          <p class="footer-brand-tagline">Block distractions. Build deep focus.<br>Your best work starts here.</p>
+        </div>
+        <nav class="footer-nav">
+          <div class="footer-nav-group">
+            <div class="footer-nav-label">Product</div>
+            <a href="index.html#features" class="footer-nav-link">Features</a>
+            <a href="index.html#how-it-works" class="footer-nav-link">How It Works</a>
+            <a href="pricing.html" class="footer-nav-link">Pricing</a>
+          </div>
+          <div class="footer-nav-group">
+            <div class="footer-nav-label">Legal</div>
+            <a href="terms.html" class="footer-nav-link">Terms of Service</a>
+            <a href="privacy.html" class="footer-nav-link">Privacy Policy</a>
+            <a href="refund.html" class="footer-nav-link">Refund Policy</a>
+          </div>
+          <div class="footer-nav-group">
+            <div class="footer-nav-label">Account</div>
+            <a href="login.html" class="footer-nav-link">Login</a>
+            <a href="signup.html" class="footer-nav-link">Sign Up</a>
+          </div>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2026 FocusShield. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusShield: Block Distractions & Reclaim Deep Focus</title>
+  <meta name="description" content="FocusShield is a powerful Chrome extension that blocks social media, sets automated focus schedules, and tracks your productivity streaks. Get more done, every day.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* â”€â”€â”€ Landing Page Exclusive Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+    /* Hero gradient glow orbs */
+    .hero-glow-green {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(61,220,132,0.08) 0%, transparent 70%);
+      top: -100px; left: -100px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-glow-blue {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);
+      bottom: 0; right: -50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Hero announcement badge */
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px 6px 8px;
+      background: rgba(61,220,132,0.06);
+      border: 1px solid rgba(61,220,132,0.18);
+      border-radius: 100px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 28px;
+      letter-spacing: 0.01em;
+    }
+    .hero-eyebrow-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.8); }
+    }
+
+    /* Hero buttons row */
+    .hero-cta-row {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .hero-social-proof {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 56px;
+    }
+    .hero-social-proof .stars { color: #f59e0b; letter-spacing: 1px; }
+    .hero-social-proof .divider { color: rgba(255,255,255,0.12); }
+
+    /* Browser frame mockup */
+    .browser-frame {
+      max-width: 920px;
+      width: 100%;
+      margin: 0 auto 60px;
+      background: #0c0e1a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+    .browser-bar {
+      height: 42px;
+      background: #13151f;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 10px;
+    }
+    .browser-dots { display: flex; gap: 6px; }
+    .browser-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .browser-url {
+      flex: 1;
+      height: 24px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      max-width: 420px;
+      margin: 0 auto;
+      gap: 6px;
+    }
+    .browser-ext {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .browser-content {
+      height: 420px;
+      background: #090b14;
+      background-image:
+        radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        radial-gradient(circle at 30% 50%, rgba(61,220,132,0.05) 0%, transparent 50%);
+      background-size: 22px 22px, 100% 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Blocked page in mockup */
+    .blocked-page {
+      text-align: center;
+      max-width: 340px;
+      padding: 32px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      margin-right: 300px;
+    }
+    .blocked-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .blocked-page h3 {
+      font-family: var(--font-headings);
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .blocked-page p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .blocked-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      background: rgba(61,220,132,0.08);
+      border: 1px solid rgba(61,220,132,0.2);
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.08em;
+    }
+
+    /* Extension popup mockup */
+    .popup-mockup {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 270px;
+      background: #0d0f1c;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+      font-size: 12.5px;
+      overflow: hidden;
+    }
+    .popup-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .popup-title {
+      display: flex; align-items: center; gap: 7px;
+      font-family: var(--font-headings);
+      font-weight: 800;
+      font-size: 13.5px;
+    }
+    .popup-status-row {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .status-active {
+      display: flex; align-items: center; gap: 6px;
+      font-weight: 700; font-size: 12px; color: var(--accent);
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+    }
+    .mock-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      background: rgba(0,0,0,0.2);
+    }
+    .mock-tab {
+      flex: 1; text-align: center;
+      padding: 8px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .mock-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .mock-body { padding: 10px 12px; }
+    .mock-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 8px;
+      margin-bottom: 5px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Toggle switch mini */
+    .mini-toggle {
+      width: 28px; height: 15px;
+      background: var(--accent);
+      border-radius: 100px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .mini-toggle::after {
+      content: '';
+      position: absolute;
+      width: 11px; height: 11px;
+      background: #000;
+      border-radius: 50%;
+      top: 2px; right: 2px;
+    }
+    .mini-toggle.off { background: rgba(255,255,255,0.12); }
+    .mini-toggle.off::after { right: auto; left: 2px; background: rgba(255,255,255,0.5); }
+
+    /* â”€â”€â”€ Social Proof Strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .proof-strip {
+      background: rgba(255,255,255,0.015);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 22px 24px;
+    }
+    .proof-strip-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+    .proof-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .proof-stat-num {
+      font-family: var(--font-headings);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .proof-stat-num span { color: var(--accent); }
+    .proof-stat-label {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .proof-divider {
+      width: 1px;
+      height: 36px;
+      background: rgba(255,255,255,0.07);
+    }
+
+    /* â”€â”€â”€ Features Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .section {
+      padding: 48px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-eyebrow {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-headings);
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      max-width: 580px;
+    }
+    .section-title span {
+      background: linear-gradient(135deg, var(--accent), #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .section-sub {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 520px;
+      line-height: 1.7;
+    }
+
+    /* Feature two-col layout */
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .feature-row.flip { direction: rtl; }
+    .feature-row.flip > * { direction: ltr; }
+    .feature-text {}
+    .feature-text .section-eyebrow { margin-bottom: 10px; }
+    .feature-text .section-title { font-size: 32px; margin-bottom: 14px; }
+    .feature-text .section-sub { font-size: 15px; margin-bottom: 28px; }
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .feature-list li .check {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: rgba(61,220,132,0.1);
+      border: 1px solid rgba(61,220,132,0.25);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .feature-list li .check svg { color: var(--accent); }
+
+    /* Feature visual card */
+    .feature-visual {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: visible;
+    }
+
+    .feature-visual-glow {
+      position: absolute;
+      bottom: -60px; right: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(61,220,132,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Platform block cards */
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .platform-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    .platform-chip-icon {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+    .platform-chip .mini-toggle { margin-left: auto; }
+
+    /* Schedule visual */
+    .schedule-visual { display: flex; flex-direction: column; gap: 10px; }
+    .schedule-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      font-size: 12.5px;
+    }
+    .schedule-time {
+      font-family: var(--font-headings);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+      min-width: 90px;
+    }
+    .schedule-label {
+      flex: 1;
+      color: var(--text-secondary);
+    }
+    .schedule-active-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+    }
+    .pill-green { background: rgba(61,220,132,0.1); color: var(--accent); border: 1px solid rgba(61,220,132,0.2); }
+    .pill-gray { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08); }
+
+    /* Stats / analytics visual */
+    .analytics-visual { }
+    .analytics-bar-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .analytics-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11.5px;
+    }
+    .analytics-bar-label { width: 60px; color: var(--text-muted); }
+    .analytics-bar-track {
+      flex: 1;
+      height: 8px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .analytics-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--accent), #10b981);
+    }
+    .analytics-bar-val { width: 32px; color: var(--text-secondary); text-align: right; font-weight: 600; }
+    .analytics-streak {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 12px 14px;
+      background: rgba(61,220,132,0.04);
+      border: 1px solid rgba(61,220,132,0.12);
+      border-radius: 10px;
+    }
+    .streak-num {
+      font-family: var(--font-headings);
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .streak-label { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
+    /* â”€â”€â”€ How it works â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .how-section {
+      padding: 80px 24px;
+      background: rgba(255,255,255,0.012);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .how-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .how-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 56px;
+      position: relative;
+    }
+    .how-step {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 28px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      position: relative;
+      transition: var(--transition);
+    }
+    .how-step:hover {
+      background: rgba(255,255,255,0.035);
+      border-color: rgba(255,255,255,0.1);
+      transform: translateY(-4px);
+    }
+    .how-step-num {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #10b981);
+      color: #000;
+      font-family: var(--font-headings);
+      font-size: 16px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .how-step h4 {
+      font-family: var(--font-headings);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .how-step p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* â”€â”€â”€ Testimonials â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .testimonials-section {
+      padding: 100px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .testimonial-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: var(--transition);
+    }
+    .testimonial-card:hover {
+      background: rgba(255,255,255,0.035);
+      border-color: rgba(255,255,255,0.1);
+    }
+    .testimonial-stars { color: #f59e0b; font-size: 13px; letter-spacing: 2px; }
+    .testimonial-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      flex: 1;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .testimonial-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px;
+      color: #000;
+      flex-shrink: 0;
+    }
+    .testimonial-name { font-size: 13.5px; font-weight: 700; }
+    .testimonial-role { font-size: 11.5px; color: var(--text-muted); }
+
+    /* â”€â”€â”€ Final CTA Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .cta-banner {
+      margin: 0 24px 80px;
+      max-width: 1152px;
+      margin-left: auto;
+      margin-right: auto;
+      background: linear-gradient(135deg, rgba(61,220,132,0.06) 0%, rgba(56,189,248,0.06) 100%);
+      border: 1px solid rgba(61,220,132,0.15);
+      border-radius: 24px;
+      padding: 64px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .cta-banner h2 {
+      font-family: var(--font-headings);
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+    }
+    .cta-banner h2 span {
+      background: linear-gradient(135deg, var(--accent), #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .cta-banner p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* â”€â”€â”€ FAQ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    .faq-section {
+      padding: 80px 24px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    /* Responsive overrides */
+    @media (max-width: 900px) {
+      .feature-row { grid-template-columns: 1fr; gap: 40px; }
+      .feature-row.flip { direction: ltr; }
+      .how-steps { grid-template-columns: 1fr; }
+      .how-steps::before { display: none; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .platform-grid { grid-template-columns: repeat(2, 1fr); }
+      .section-title { font-size: 30px; }
+      .cta-banner { padding: 44px 28px; }
+      .cta-banner h2 { font-size: 30px; }
+      .proof-strip-inner { gap: 28px; }
+      .proof-divider { display: none; }
+    }
+    @media (max-width: 600px) {
+      .hero-cta-row { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><img src="icons/icon128.png" width="22" height="22" alt="FocusShield Logo"><span>FocusShield</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="nav-login">Login</a>
+        <a href="signup.html" class="nav-signup">Sign Up</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- â•â•â• HERO SECTION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <main>
+    <div style="position: relative; overflow: visible; padding: 100px 24px 0px;">
+      <div class="hero-glow-green"></div>
+      <div class="hero-glow-blue"></div>
+      <div class="hero-inner" style="text-align: center; max-width: 1200px; margin: 0 auto;">
+
+
+
+        <h1 style="font-family: var(--font-headings); font-size: clamp(42px, 6vw, 70px); font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin-bottom: 22px; max-width: 860px; margin-left: auto; margin-right: auto;">
+          Stop Wasting Time.<br>
+          <span style="background: linear-gradient(135deg, var(--accent) 0%, #10b981 50%, var(--sky) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Shield Your Focus.
+          </span>
+        </h1>
+
+        <p style="font-size: 18px; color: var(--text-secondary); max-width: 560px; margin: 0 auto 36px; line-height: 1.7; font-weight: 400;">
+          FocusShield blocks social media, enforces work schedules, and tracks your deep-work streaks, all from one sleek Chrome extension.
+        </p>
+
+        <div class="hero-cta-row">
+          <a href="#" class="btn btn-primary" style="padding: 14px 28px; font-size: 15px; display:inline-flex; align-items:center; gap:10px; color:#000; font-weight:800;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.15);">
+              <svg width="17" height="17" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M5.795 8.361C16.952-4.624 37.639-2.06 45.373 13.107c-5.444.002-13.97-.002-18.586 0-3.349.001-5.511-.075-7.852 1.158-2.753 1.449-4.83 4.135-5.555 7.29L5.795 8.36z" fill="#EA4335"/><path d="M16.015 24c0 4.4 3.578 7.98 7.977 7.98 4.398 0 7.976-3.58 7.976-7.98s-3.578-7.98-7.976-7.98c-4.4 0-7.977 3.58-7.977 7.98z" fill="#4285F4"/><path d="M27.088 34.446c-4.477 1.33-9.716-.145-12.586-5.099-2.19-3.782-7.978-13.864-10.609-18.45C-5.322 25.02 2.619 44.264 19.346 47.549l7.742-13.103z" fill="#34A853"/><path d="M31.401 16.018c3.73 3.468 4.542 9.084 2.016 13.439-1.903 3.28-7.977 13.531-10.92 18.495 17.234 1.062 29.797-15.828 24.122-31.934H31.401z" fill="#FBBC05"/></g></svg>
+            </div>
+            Add to Chrome (It's Free)
+          </a>
+          <a href="pricing.html" class="btn btn-secondary" style="padding: 14px 28px; font-size: 15px;">
+            View Pro Plans
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <div class="hero-social-proof">
+          <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <span>5 / 5 on Chrome Web Store</span>
+        </div>
+
+        <!-- Browser Mockup -->
+        <div class="browser-frame">
+          <div class="browser-bar">
+            <div class="browser-dots">
+              <div class="browser-dot" style="background:#ef4444;"></div>
+              <div class="browser-dot" style="background:#f59e0b;"></div>
+              <div class="browser-dot" style="background:#10b981;"></div>
+            </div>
+            <div class="browser-url">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              netflix.com
+            </div>
+            <div class="browser-ext" style="margin-left: auto;">
+              <img src="icons/icon128.png" width="16" height="16" alt="FocusShield">
+            </div>
+          </div>
+          <div class="browser-content">
+
+            <!-- â”€â”€ Focus Mode Block Screen (fills center-left) â”€â”€ -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 0 30px; width: calc(100% - 270px); margin-left: 0; margin-right: auto;">
+
+              <!-- Logo with glow -->
+              <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(61,220,132,0.05); border: 1.5px solid rgba(61,220,132,0.18); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 32px rgba(61,220,132,0.12);">
+                <img src="icons/icon128.png" width="38" height="38" alt="FocusShield" style="display: block;">
+              </div>
+
+              <!-- "netflix.com is blocked" badge -->
+              <div style="display: inline-flex; align-items: center; gap: 5px; background: rgba(61,220,132,0.06); border: 1px solid rgba(61,220,132,0.18); border-radius: 100px; padding: 4px 11px; font-size: 10px; font-weight: 700; color: #3ddc84;">
+                <span style="width: 5px; height: 5px; border-radius: 50%; background: #3ddc84; flex-shrink: 0;"></span>
+                www.netflix.com is blocked
+              </div>
+
+              <!-- Title -->
+              <h3 style="font-family: var(--font-headings); font-size: 20px; font-weight: 800; color: #fff; margin: 0; line-height: 1.15;">You're in Focus Mode</h3>
+
+              <!-- Subtitle -->
+              <p style="font-size: 11px; color: rgba(255,255,255,0.38); margin: 0; line-height: 1.55; max-width: 300px;">
+                You chose to block this site to protect your focus and deep work.<br>
+                Stay dedicated until your timer ends, you got this &#x1F44A;
+              </p>
+
+              <!-- Timer card -->
+              <div style="background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 12px 28px; width: 100%; max-width: 300px; box-sizing: border-box; text-align: center;">
+                <div style="font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Time Remaining Until Auto-Unlock</div>
+                <div style="display: flex; align-items: flex-start; justify-content: center; gap: 4px;">
+                  <div style="text-align: center;">
+                    <div style="font-size: 30px; font-weight: 800; color: #fff; font-family: 'Courier New', monospace; line-height: 1;">00</div>
+                    <div style="font-size: 8px; color: rgba(255,255,255,0.28); font-weight: 700; text-transform: uppercase; margin-top: 2px;">Hrs</div>
+                  </div>
+                  <div style="font-size: 28px; font-weight: 800; color: #3ddc84; line-height: 1; padding-top: 1px;">:</div>
+                  <div style="text-align: center;">
+                    <div style="font-size: 30px; font-weight: 800; color: #3ddc84; font-family: 'Courier New', monospace; line-height: 1;">45</div>
+                    <div style="font-size: 8px; color: rgba(255,255,255,0.28); font-weight: 700; text-transform: uppercase; margin-top: 2px;">Min</div>
+                  </div>
+                  <div style="font-size: 28px; font-weight: 800; color: #3ddc84; line-height: 1; padding-top: 1px;">:</div>
+                  <div style="text-align: center;">
+                    <div style="font-size: 30px; font-weight: 800; color: #3ddc84; font-family: 'Courier New', monospace; line-height: 1;">51</div>
+                    <div style="font-size: 8px; color: rgba(255,255,255,0.28); font-weight: 700; text-transform: uppercase; margin-top: 2px;">Sec</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- OR Unlock Early divider -->
+              <div style="display: flex; align-items: center; gap: 8px; width: 100%; max-width: 300px;">
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.07);"></div>
+                <span style="font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap;">Or Unlock Early</span>
+                <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.07);"></div>
+              </div>
+
+              <!-- Complete Challenges button -->
+              <button style="display: flex; align-items: center; justify-content: center; gap: 6px; background: transparent; border: 1.5px solid rgba(61,220,132,0.22); color: #3ddc84; border-radius: 100px; padding: 8px 18px; font-size: 11.5px; font-weight: 700; cursor: pointer; font-family: inherit; max-width: 300px; width: 100%;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+                Complete Challenges to Unlock
+              </button>
+            </div>
+
+            <!-- â”€â”€ FocusShield Extension Popup (top-right corner) â”€â”€ -->
+            <div style="position: absolute; top: 10px; right: 12px; width: 255px; background: #0c0e1a; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.7); overflow: hidden; font-family: inherit;">
+
+              <!-- Header: matches real extension popup -->
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 13px 11px;">
+                <!-- Logo + name -->
+                <div style="display: flex; align-items: center; gap: 7px;">
+                  <img src="icons/icon128.png" width="22" height="22" alt="FocusShield" style="display: block;">
+                  <span style="font-size: 14px; font-weight: 800; color: #fff; font-family: var(--font-headings);">FocusShield</span>
+                </div>
+                <!-- Action icons -->
+                <div style="display: flex; gap: 5px;">
+                  <!-- Analytics icon -->
+                  <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  </div>
+                  <!-- Settings / gear icon -->
+                  <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.67a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Home / Schedule tabs -->
+              <div style="display: flex; gap: 3px; padding: 3px; background: rgba(0,0,0,0.25); border-radius: 9px; margin: 0 13px 10px;">
+                <div style="flex: 1; text-align: center; padding: 5px 0; font-size: 11px; font-weight: 700; color: #3ddc84; background: rgba(61,220,132,0.07); border: 1px solid rgba(61,220,132,0.12); border-radius: 7px;">Home</div>
+                <div style="flex: 1; text-align: center; padding: 5px 0; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.32);">Schedule</div>
+              </div>
+
+              <!-- Current Site -->
+              <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 11px; margin: 0 13px 10px;">
+                <div style="font-size: 7.5px; font-weight: 700; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 7px; text-align: left;">Current Site</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
+                    <div style="width: 20px; height: 20px; border-radius: 4px; background: #000; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <svg viewBox="0 0 24 24" width="12" height="16" style="display: block;">
+                        <path d="M4 0 L8.5 0 L8.5 18 C 7 18.5 5.5 18.8 4 19 Z" fill="#B20710"/>
+                        <path d="M15.5 0 L20 0 L20 19 C 18.5 18.8 17 18.5 15.5 18 Z" fill="#B20710"/>
+                        <path d="M4 0 L9 0 L20 19 L15 19 Z" fill="#E50914"/>
+                      </svg>
+                    </div>
+                    <span style="font-size: 12px; font-weight: 600; color: #e5e7eb;">netflix.com</span>
+                  </div>
+                  <div style="font-size: 7.5px; font-weight: 700; color: #ef4444; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.18); padding: 3px 6px; border-radius: 5px; white-space: nowrap; flex-shrink: 0;">Blocked for 45m 51s</div>
+                </div>
+              </div>
+
+              <!-- Blocked Sites -->
+              <div style="padding: 0 13px 12px; display: flex; flex-direction: column; gap: 5px;">
+                <div style="font-size: 7.5px; font-weight: 700; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; text-align: left;">Blocked Sites</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 7px 9px; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 7px;">
+                  <span style="font-size: 11px; color: rgba(255,255,255,0.7);">primevideo.com</span>
+                  <span style="font-size: 10px; font-weight: 700; color: #3ddc84;">54m 26s left</span>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 7px 9px; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 7px;">
+                  <span style="font-size: 11px; color: rgba(255,255,255,0.7);">netflix.com</span>
+                  <span style="font-size: 10px; font-weight: 700; color: #3ddc84;">45m 51s left</span>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 7px 9px; background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 7px;">
+                  <span style="font-size: 11px; color: rgba(255,255,255,0.7);">disneyplus.com</span>
+                  <span style="font-size: 10px; font-weight: 700; color: #3ddc84;">Indefinitely</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="features" style="text-align: center; padding: 20px 24px 20px; max-width: 800px; margin: 0 auto;">
+      <h2 style="font-family: var(--font-headings); font-size: clamp(32px, 5vw, 46px); font-weight: 800; background: linear-gradient(135deg, var(--accent), #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 16px; letter-spacing: -1.5px; line-height: 1.15; display: inline-block;">See what you can do</h2>
+      <p style="font-size: 16px; color: var(--text-secondary); line-height: 1.6; margin: 0; font-weight: 400; max-width: 580px; margin-left: auto; margin-right: auto;">Explore the core shielding tools built into FocusShield to reclaim your attention and optimize your workflow.</p>
+    </div>
+
+    <!-- â•â•â• FEATURES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <div id="features-list">
+
+      <!-- Feature 1: Website Block -->
+      <div class="section">
+        <div class="feature-row">
+          <div class="feature-text">
+            <div class="section-eyebrow">Custom Website Blocking</div>
+            <h2 class="section-title">Block <span>any website</span> you choose</h2>
+            <p class="section-sub">Paste any URL and it's immediately blocked. Whether it's a niche forum, a news site, or a personal time-sink, FocusShield handles it instantly.</p>
+            <ul class="feature-list">
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Add any custom domain or full URL in seconds
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Clean redirect to a motivational blocked screen
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Target specific subpages, URL paths, or entire domains
+              </li>
+            </ul>
+          </div>
+          <div class="feature-visual">
+            <div class="feature-visual-glow"></div>
+
+            <!-- Extension Popup UI -->
+
+              <!-- Current Site Section -->
+              <div style="padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 10px;">Current Site</div>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <!-- Netflix N logo -->
+                    <div style="width: 28px; height: 28px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <svg viewBox="0 0 24 24" width="16" height="16" style="display: block;">
+                        <!-- Left leg -->
+                        <path d="M4.2 0 L8.8 0 L8.8 22 C 7.3 22.5 5.8 22.8 4.2 23 Z" fill="#B20710" />
+                        <!-- Right leg -->
+                        <path d="M15.2 0 L19.8 0 L19.8 23 C 18.2 22.8 16.7 22.5 15.2 22 Z" fill="#B20710" />
+                        <!-- Diagonal ribbon -->
+                        <path d="M4.2 0 L9.2 0 L19.8 23 L14.8 23 Z" fill="#E50914" />
+                      </svg>
+                    </div>
+                    <span style="font-size: 14px; font-weight: 600; color: #e5e7eb;">netflix.com</span>
+                  </div>
+                  <!-- Block This Site button -->
+                  <button style="display: flex; align-items: center; gap: 6px; background: #E50914; border: none; border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; white-space: nowrap;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                    Block This Site
+                  </button>
+                </div>
+              </div>
+
+              <!-- Blocked Sites Section -->
+              <div style="padding: 14px 16px;">
+                <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 10px;">Blocked Sites</div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+
+                  <!-- disneyplus.com -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 9px;">
+                    <div style="display: flex; align-items: center; gap: 9px;">
+                      <span style="font-size: 13px; font-weight: 500; color: #d1d5db;">disneyplus.com</span>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 600; color: #10b981;">54m 51s left</span>
+                  </div>
+
+                  <!-- youtube.com -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 9px;">
+                    <div style="display: flex; align-items: center; gap: 9px;">
+                      <span style="font-size: 13px; font-weight: 500; color: #d1d5db;">youtube.com</span>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 600; color: #10b981;">Indefinitely</span>
+                  </div>
+
+                  <!-- primevideo.com -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 9px;">
+                    <div style="display: flex; align-items: center; gap: 9px;">
+                      <span style="font-size: 13px; font-weight: 500; color: #d1d5db;">primevideo.com</span>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 600; color: #10b981;">9h 59m left</span>
+                  </div>
+
+              </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Social Media (Platform Blocking) -->
+      <div class="section">
+        <div class="feature-row flip">
+          <div class="feature-text">
+            <div class="section-eyebrow">Platform Shielding</div>
+            <h2 class="section-title">Manage social platforms <span>in one click</span></h2>
+            <p class="section-sub">YouTube, Instagram, Facebook, TikTok, Reddit, X: toggle them all off with a single switch. No more accidental scrolling derailing your deep-work sessions.</p>
+            <ul class="feature-list">
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                6 popular social networks supported out of the box
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Block individual sub-features like YouTube comments or shorts
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Toggle master switches to shield whole platforms instantly
+              </li>
+            </ul>
+          </div>
+
+          <div class="feature-visual">
+            <div class="feature-visual-glow"></div>
+            <div style="display: flex; gap: 12px; width: 100%; align-items: stretch;">
+              
+              <!-- Card 1: Platforms Toggle List -->
+              <div style="flex: 1; min-width: 0; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">
+                <!-- YouTube Row -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); position: relative;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                      <path fill="#3ddc84" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    <span style="font-size: 13.5px; font-weight: 700; color: #e5e7eb;">YouTube</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width:38px;height:22px;background:#3ddc84;border-radius:11px;position:relative;cursor:pointer;">
+                      <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                    </div>
+                    <!-- Settings Cog with Mouse Pointer exactly over it -->
+                    <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 14px; height: 14px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffffff" stroke="#111827" stroke-width="1.5" style="position: absolute; top: 4px; left: 4px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); pointer-events: none; z-index: 100;">
+                        <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Facebook Row -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                      <path fill="#3ddc84" d="M24 12.073c0-6.627  -5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078 v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953 H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328 l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span style="font-size: 13.5px; font-weight: 700; color: #e5e7eb;">Facebook</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width:38px;height:22px;background:#374151;border-radius:11px;position:relative;cursor:pointer;">
+                      <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                    </div>
+                    <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 14px; height: 14px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Twitter / X Row -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                      <path fill="#3ddc84" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <span style="font-size: 13.5px; font-weight: 700; color: #e5e7eb;">Twitter / X</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width:38px;height:22px;background:#3ddc84;border-radius:11px;position:relative;cursor:pointer;">
+                      <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                    </div>
+                    <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 14px; height: 14px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Reddit Row -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                      <path fill="#3ddc84" d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597 -.547-.8 3.747c1.824-.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333 -1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004 -2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.49 1.168-1.555 2.992-1.624l.8-3.747 -2.613.547a1.25 1.25 0 0 1-1.248 1.108c -.688 0-1.249-.561-1.249-1.249 0-.688.561 -1.249 1.249-1.249zm-5.51 7.826c-.688 0 -1.249.561-1.249 1.249 0 .688.561 1.249 1.249 1.249.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249zm4.99 0c -.688 0-1.249.561-1.249 1.249 0 .688.561 1.249 1.249 1.249.688 0 1.249-.561 1.249-1.249 0-.688-.561-1.249-1.249-1.249z"/>
+                    </svg>
+                    <span style="font-size: 13.5px; font-weight: 700; color: #e5e7eb;">Reddit</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width:38px;height:22px;background:#374151;border-radius:11px;position:relative;cursor:pointer;">
+                      <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                    </div>
+                    <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 14px; height: 14px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Instagram Row -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#3ddc84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                    <span style="font-size: 13.5px; font-weight: 700; color: #e5e7eb;">Instagram</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width:38px;height:22px;background:#374151;border-radius:11px;position:relative;cursor:pointer;">
+                      <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                    </div>
+                    <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 14px; height: 14px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TikTok Row -->
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 13px 16px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                      <path fill="#3ddc84" d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.06-2.89-.52-4.08-1.39-.4-.3-.77-.64-1.1-1.01v6.41c.02 2.21-.77 4.54-2.45 6.01-1.87 1.69-4.7 2.14-7.02 1.25-2.73-1.01-4.71-3.9-4.32-6.93.3-2.49 2.11-4.72 4.63-5.26.83-.17 1.69-.19 2.52-.06v4.06c-.84-.19-1.78-.06-2.52.39-.99.59-1.56 1.79-1.35 2.92.17.97.94 1.79 1.9 1.98.98.19 2.05-.23 2.52-1.12.28-.53.37-1.15.35-1.75V.02z"/>
+                    </svg>
+                    <span style="font-size: 13.5px; font-weight: 700; color: #e5e7eb;">TikTok</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width:38px;height:22px;background:#374151;border-radius:11px;position:relative;cursor:pointer;">
+                      <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                    </div>
+                    <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 14px; height: 14px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: YouTube Detail Options -->
+              <div style="flex: 1; min-width: 0; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 16px; display: flex; flex-direction: column;">
+                <div style="font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 12px;">What to block on YouTube</div>
+                <div style="display: flex; flex-direction: column; gap: 9px; flex: 1;">
+                  <!-- Item 1 -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 18px; height: 18px; background: #3ddc84; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span style="font-size: 13px; font-weight: 600; color: #d1d5db;">Sidebar recommendations</span>
+                  </div>
+                  <!-- Item 2 -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 18px; height: 18px; background: #3ddc84; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span style="font-size: 13px; font-weight: 600; color: #d1d5db;">Comments section</span>
+                  </div>
+                  <!-- Item 3 -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 18px; height: 18px; background: #3ddc84; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span style="font-size: 13px; font-weight: 600; color: #d1d5db;">Homepage video feed</span>
+                  </div>
+                  <!-- Item 4 -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 18px; height: 18px; background: #3ddc84; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span style="font-size: 13px; font-weight: 600; color: #d1d5db;">Shorts shelf</span>
+                  </div>
+                  <!-- Item 5 -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 18px; height: 18px; background: #3ddc84; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <span style="font-size: 13px; font-weight: 600; color: #d1d5db;">Autoplay next video</span>
+                  </div>
+                </div>
+
+                <div style="height: 1px; background: rgba(255,255,255,0.06); margin: 14px 0 10px 0;"></div>
+
+                <!-- Block Full Site red button -->
+                <button style="display: flex; align-items: center; justify-content: center; gap: 6px; background: #ef4444; border: none; border-radius: 8px; padding: 10px; font-size: 12.5px; font-weight: 700; color: #fff; cursor: pointer; width: 100%;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                  Block Full Site
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3: Smart Filters -->
+      <div class="section">
+        <div class="feature-row">
+          <div class="feature-text">
+            <div class="section-eyebrow">Smart Filter Blocking</div>
+            <h2 class="section-title">Block by <span>category, not just URL</span></h2>
+            <p class="section-sub">Don't want to block a specific site, just an entire type of content? FocusShield's smart filter engine lets you block whole categories at once.</p>
+            <ul class="feature-list">
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Pre-built categories: Social Media, Shopping, Gaming, News
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Keyword-based filter rules that catch any matching page
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Mix and match: combine category filters with specific URLs
+              </li>
+            </ul>
+          </div>
+          <div class="feature-visual">
+            <div class="feature-visual-glow" style="background: radial-gradient(circle, rgba(251,191,36,0.07) 0%, transparent 70%);"></div>
+
+            <!-- Extension-style filter list card -->
+            <div style="display: flex; flex-direction: column;">
+
+                <!-- Adult & NSFW -->
+                <div style="display:flex; align-items:center; justify-content:space-between; padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <div style="display:flex;align-items:center;gap:13px;">
+                    <div style="width:34px;height:34px;border-radius:9px;background:rgba(74,222,128,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                      <!-- Eye-off icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style="font-size:13.5px;font-weight:700;color:#e5e7eb;">Adult & NSFW</div>
+                      <div style="font-size:11.5px;color:#6b7280;margin-top:2px;">Blocks adult sites and mature searches</div>
+                    </div>
+                  </div>
+                  <!-- Toggle ON -->
+                  <div style="width:38px;height:22px;background:#4ade80;border-radius:11px;position:relative;flex-shrink:0;">
+                    <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                  </div>
+                </div>
+
+                <!-- Gaming & Esports -->
+                <div style="display:flex; align-items:center; justify-content:space-between; padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <div style="display:flex;align-items:center;gap:13px;">
+                    <div style="width:34px;height:34px;border-radius:9px;background:rgba(74,222,128,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                      <!-- Gamepad icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6" y1="12" x2="10" y2="12"/>
+                        <line x1="8" y1="10" x2="8" y2="14"/>
+                        <line x1="15" y1="13" x2="15.01" y2="13"/>
+                        <line x1="18" y1="11" x2="18.01" y2="11"/>
+                        <rect x="2" y="6" width="20" height="12" rx="2"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style="font-size:13.5px;font-weight:700;color:#e5e7eb;">Gaming & Esports</div>
+                      <div style="font-size:11.5px;color:#6b7280;margin-top:2px;">Blocks Roblox, Twitch, Steam, and online games</div>
+                    </div>
+                  </div>
+                  <!-- Toggle ON -->
+                  <div style="width:38px;height:22px;background:#4ade80;border-radius:11px;position:relative;flex-shrink:0;">
+                    <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                  </div>
+                </div>
+
+                <!-- Shopping & E-Commerce -->
+                <div style="display:flex; align-items:center; justify-content:space-between; padding: 15px 18px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <div style="display:flex;align-items:center;gap:13px;">
+                    <div style="width:34px;height:34px;border-radius:9px;background:rgba(74,222,128,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                      <!-- Shopping bag icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style="font-size:13.5px;font-weight:700;color:#e5e7eb;">Shopping & E-Commerce</div>
+                      <div style="font-size:11.5px;color:#6b7280;margin-top:2px;">Blocks Amazon, eBay, and e-shops</div>
+                    </div>
+                  </div>
+                  <!-- Toggle ON -->
+                  <div style="width:38px;height:22px;background:#4ade80;border-radius:11px;position:relative;flex-shrink:0;">
+                    <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                  </div>
+                </div>
+
+                <!-- Gambling & Betting -->
+                <div style="display:flex; align-items:center; justify-content:space-between; padding: 15px 18px;">
+                  <div style="display:flex;align-items:center;gap:13px;">
+                    <div style="width:34px;height:34px;border-radius:9px;background:rgba(74,222,128,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                      <!-- Dice icon -->
+                      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="3"/>
+                        <circle cx="8" cy="8" r="1.2" fill="#4ade80"/>
+                        <circle cx="16" cy="8" r="1.2" fill="#4ade80"/>
+                        <circle cx="8" cy="16" r="1.2" fill="#4ade80"/>
+                        <circle cx="16" cy="16" r="1.2" fill="#4ade80"/>
+                        <circle cx="12" cy="12" r="1.2" fill="#4ade80"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style="font-size:13.5px;font-weight:700;color:#e5e7eb;">Gambling & Betting</div>
+                      <div style="font-size:11.5px;color:#6b7280;margin-top:2px;">Blocks online casinos and betting sites</div>
+                    </div>
+                  </div>
+                  <!-- Toggle ON -->
+                  <div style="width:38px;height:22px;background:#4ade80;border-radius:11px;position:relative;flex-shrink:0;">
+                    <div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3);"></div>
+                  </div>
+                </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 4: Schedules -->
+      <div class="section">
+        <div class="feature-row flip">
+          <div class="feature-text">
+            <div class="section-eyebrow">Smart Scheduling</div>
+            <h2 class="section-title">Set it once. <span>Stay focused automatically.</span></h2>
+            <p class="section-sub">Create recurring work schedules that automatically activate your block lists. Whether it's Mon-Fri 9 AM or Pomodoro-style intervals, FocusShield enforces them without you lifting a finger.</p>
+            <ul class="feature-list">
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Daily, weekly, and custom recurring schedules
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Auto-activates without needing the browser open
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Enforce strict schedules that cannot be bypassed during focus sessions
+              </li>
+            </ul>
+          </div>
+          <div class="feature-visual">
+            <div class="feature-visual-glow" style="background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);"></div>
+
+            <!-- Extension-style Active Schedules card -->
+
+              <!-- Header -->
+              <div style="padding: 14px 18px 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280;">Active Schedules</div>
+              </div>
+
+              <!-- Schedule rows -->
+              <div style="display: flex; flex-direction: column;">
+
+                <!-- netflix.com -->
+                <div style="padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+                    <div style="flex: 1;">
+                      <div style="font-size: 13.5px; font-weight: 700; color: #e5e7eb; margin-bottom: 5px;">netflix.com</div>
+                      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span style="font-size: 12.5px; font-weight: 600; color: #ef4444; white-space: nowrap;">9:00 AM - 5:00 PM</span>
+                      </div>
+                      <div style="font-size: 11.5px; color: #6b7280;">Weekdays</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; padding-top: 2px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- disneyplus.com (active - green dot) -->
+                <div style="padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+                    <div style="flex: 1;">
+                      <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 5px;">
+                        <span style="font-size: 13.5px; font-weight: 700; color: #e5e7eb;">disneyplus.com</span>
+                        <div style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 6px rgba(34,197,94,0.6);"></div>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span style="font-size: 12.5px; font-weight: 600; color: #ef4444; white-space: nowrap;">9:00 AM - 5:00 PM</span>
+                      </div>
+                      <div style="font-size: 11.5px; color: #6b7280;">Weekends</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; padding-top: 2px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- primevideo.com -->
+                <div style="padding: 14px 18px;">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+                    <div style="flex: 1;">
+                      <div style="font-size: 13.5px; font-weight: 700; color: #e5e7eb; margin-bottom: 5px;">primevideo.com</div>
+                      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span style="font-size: 12.5px; font-weight: 600; color: #ef4444; white-space: nowrap;">5:00 PM - 10:00 PM</span>
+                      </div>
+                      <div style="font-size: 11.5px; color: #6b7280;">Tue, Wed, Thu</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; padding-top: 2px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 5: Analytics -->
+      <div class="section">
+        <div class="feature-row">
+          <div class="feature-text">
+            <div class="section-eyebrow">Focus Analytics</div>
+            <h2 class="section-title">See your <span>productivity grow</span> over time</h2>
+            <p class="section-sub">Track how many hours you saved this week, your longest focus streak, and which days you were most productive. Data that motivates you to keep going.</p>
+            <ul class="feature-list">
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Daily and weekly focus time charts
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Streak tracking to build consistent habits
+              </li>
+              <li>
+                <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                Sites blocked count and time saved summary
+              </li>
+            </ul>
+          </div>
+          <div class="feature-visual" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="feature-visual-glow"></div>
+            <!-- Extension Analytics UI Replica -->
+
+            <!-- Filter Bar -->
+            <div style="display: flex; gap: 4px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 3px;">
+              <div style="flex: 1; background: rgba(255,255,255,0.08); color: #3ddc84; font-size: 11px; font-weight: 700; padding: 6px 0; border-radius: 8px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.15);">Daily</div>
+              <div style="flex: 1; color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 600; padding: 6px 0; border-radius: 8px; text-align: center;">Weekly</div>
+              <div style="flex: 1; color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 600; padding: 6px 0; border-radius: 8px; text-align: center;">Monthly</div>
+              <div style="flex: 1; color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 600; padding: 6px 0; border-radius: 8px; text-align: center;">All Time</div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-width: 0;">
+              <!-- Day Streak -->
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px;">
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px rgba(251,146,60,0.35));">
+                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" fill="rgba(251,146,60,0.1)"/>
+                  </svg>
+                </div>
+                <div style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -0.01em;">1</div>
+                <div style="font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.05em;">Day Streak</div>
+              </div>
+
+              <!-- Time Saved -->
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px;">
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px rgba(56,189,248,0.35));">
+                    <circle cx="12" cy="12" r="10" fill="rgba(56,189,248,0.08)"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </div>
+                <div style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -0.01em;">1h 52m</div>
+                <div style="font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.05em;">Time Saved</div>
+              </div>
+
+              <!-- Focus Blocks -->
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px;">
+                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px rgba(61,220,132,0.35));">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="rgba(61,220,132,0.1)"/>
+                  </svg>
+                </div>
+                <div style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.1; letter-spacing: -0.01em;">4</div>
+                <div style="font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.05em;">Focus Blocks</div>
+              </div>
+            </div>
+
+            <!-- Top Distractions Blocked -->
+            <div>
+              <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.4); margin-bottom: 10px;">Top Distractions Blocked <span style="text-transform: none; font-size: 9px; opacity: 0.7; font-weight: 600;">(Daily)</span></div>
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
+
+                <!-- netflix.com -->
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px;">
+                    <span style="font-weight: 600; color: #fff;">netflix.com</span>
+                    <span style="font-weight: 700; color: #3ddc84;">2 blocks</span>
+                  </div>
+                  <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden;">
+                    <div style="height: 100%; width: 100%; background: linear-gradient(90deg, #3ddc84 0%, #059669 100%); border-radius: 99px;"></div>
+                  </div>
+                </div>
+
+                <!-- disneyplus.com -->
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px;">
+                    <span style="font-weight: 600; color: #fff;">disneyplus.com</span>
+                    <span style="font-weight: 700; color: #3ddc84;">1 block</span>
+                  </div>
+                  <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden;">
+                    <div style="height: 100%; width: 50%; background: linear-gradient(90deg, #3ddc84 0%, #059669 100%); border-radius: 99px;"></div>
+                  </div>
+                </div>
+
+                <!-- primevideo.com -->
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px;">
+                    <span style="font-weight: 600; color: #fff;">primevideo.com</span>
+                    <span style="font-weight: 700; color: #3ddc84;">1 block</span>
+                  </div>
+                  <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden;">
+                    <div style="height: 100%; width: 50%; background: linear-gradient(90deg, #3ddc84 0%, #059669 100%); border-radius: 99px;"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- â•â•â• HOW IT WORKS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <div id="how-it-works" class="how-section">
+      <div class="how-inner">
+        <div style="text-align: center;">
+          <div class="section-eyebrow" style="justify-content: center; display: flex;">How It Works</div>
+          <h2 class="section-title" style="max-width: 500px; margin: 12px auto 0; text-align: center;">Up and running in <span>under 2 minutes</span></h2>
+        </div>
+        <div class="how-steps">
+          <div class="how-step">
+            <div class="how-step-num">1</div>
+            <div>
+              <h4>Install the Extension</h4>
+              <p>Click "Add to Chrome" and confirm the install. FocusShield is instantly available in your browser toolbar with zero sign-up required.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step-num">2</div>
+            <div>
+              <h4>Choose What to Block</h4>
+              <p>Pick the platforms and categories you want to block. Toggle switches control everything. Set schedules to make blocking automatic.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step-num">3</div>
+            <div>
+              <h4>Get Into Deep Focus</h4>
+              <p>FocusShield runs silently in the background. When you hit a blocked site, you're redirected to a clean motivation screen instead.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- â•â•â• TESTIMONIALS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="testimonials-section">
+      <div style="text-align: center;">
+        <div class="section-eyebrow" style="display:flex; justify-content:center;">User Reviews</div>
+        <h2 class="section-title" style="text-align:center; margin: 12px auto 0; max-width: 500px;">Loved by people who <span>value their time</span></h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I used to lose 3 hours a day to YouTube. FocusShield stopped that instantly. My project delivery time has literally halved."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background: linear-gradient(135deg, #3ddc84, #10b981);">A</div>
+            <div>
+              <div class="testimonial-name">Ahmed K.</div>
+              <div class="testimonial-role">Freelance Developer</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card" style="border-color: rgba(61,220,132,0.15);">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"The scheduled blocking is a game changer. I set 9-to-5 focus mode on weekdays and it just works. Zero willpower required now."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background: linear-gradient(135deg, #38bdf8, #6366f1);">S</div>
+            <div>
+              <div class="testimonial-name">Sara M.</div>
+              <div class="testimonial-role">Product Manager</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"Clean UI, works perfectly, doesn't slow Chrome at all. The streak tracker keeps me motivated. Exactly what I was looking for."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">R</div>
+            <div>
+              <div class="testimonial-name">Rahul D.</div>
+              <div class="testimonial-role">CS Student</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- â•â•â• FINAL CTA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="cta-banner">
+      <h2>Start Focusing<br><span>Right Now, For Free</span></h2>
+      <p>Join thousands of people who've taken back control of their time. No credit card. No account needed to start.</p>
+      <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+        <a href="#" class="btn btn-primary" style="padding: 15px 32px; font-size: 15px; display:inline-flex; align-items:center; gap:10px; color:#000; font-weight:800;">
+          <div style="width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="17" height="17" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M5.795 8.361C16.952-4.624 37.639-2.06 45.373 13.107c-5.444.002-13.97-.002-18.586 0-3.349.001-5.511-.075-7.852 1.158-2.753 1.449-4.83 4.135-5.555 7.29L5.795 8.36z" fill="#EA4335"/><path d="M16.015 24c0 4.4 3.578 7.98 7.977 7.98 4.398 0 7.976-3.58 7.976-7.98s-3.578-7.98-7.976-7.98c-4.4 0-7.977 3.58-7.977 7.98z" fill="#4285F4"/><path d="M27.088 34.446c-4.477 1.33-9.716-.145-12.586-5.099-2.19-3.782-7.978-13.864-10.609-18.45C-5.322 25.02 2.619 44.264 19.346 47.549l7.742-13.103z" fill="#34A853"/><path d="M31.401 16.018c3.73 3.468 4.542 9.084 2.016 13.439-1.903 3.28-7.977 13.531-10.92 18.495 17.234 1.062 29.797-15.828 24.122-31.934H31.401z" fill="#FBBC05"/></g></svg>
+          </div>
+          Add to Chrome (Free)
+        </a>
+        <a href="pricing.html" class="btn btn-secondary" style="padding: 15px 32px; font-size: 15px;">See Pro Features</a>
+      </div>
+      <div style="margin-top: 20px; font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:16px; justify-content:center; flex-wrap:wrap;">
+        <span>✓ Free forever plan</span>
+        <span>✓ No account required</span>
+        <span>✓ Works on all websites</span>
+      </div>
+    </div>
+
+    <!-- ≡≡≡  FAQ ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡  -->
+    <div class="faq-section">
+      <h2 class="faq-title" style="text-align:center;">Frequently Asked Questions</h2>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How does FocusShield block websites?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          FocusShield uses Chrome's secure <code>declarativeNetRequest</code> API to intercept and redirect requests to blocked domains. When you visit a blocked site, you're taken to a clean, local motivational screen, meaning no data ever leaves your browser.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Is FocusShield really free?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          Yes! The core features (platform blocking, custom URLs, and basic schedules) are completely free with no account needed. The Pro plan adds cloud sync, unlimited schedules, and advanced analytics.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Can I bypass the block screen?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          You can toggle blocking on and off from the extension popup at any time. For stronger commitment mode, Pro users can enable a password lock so blocks can't be bypassed without it.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Does it slow down my browser?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          No. FocusShield uses Chrome's native blocking API which operates at the network level instead of via injected JavaScript. This makes it extremely lightweight with zero measurable performance impact.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What happens to my data?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          Free plan data is stored locally in your browser. The Pro plan syncs settings to the cloud so you can use your configuration across multiple computers. We never sell or share your data. See our <a href="privacy.html" style="color: var(--accent);">Privacy Policy</a> for full details.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="logo"><img src="icons/icon128.png" width="20" height="20" alt="FocusShield Logo"><span>FocusShield</span></a>
+          <p class="footer-brand-tagline">Block distractions. Build deep focus.<br>Your best work starts here.</p>
+        </div>
+        <nav class="footer-nav">
+          <div class="footer-nav-group">
+            <div class="footer-nav-label">Product</div>
+            <a href="#features" class="footer-nav-link">Features</a>
+            <a href="#how-it-works" class="footer-nav-link">How It Works</a>
+            <a href="pricing.html" class="footer-nav-link">Pricing</a>
+          </div>
+          <div class="footer-nav-group">
+            <div class="footer-nav-label">Legal</div>
+            <a href="terms.html" class="footer-nav-link">Terms of Service</a>
+            <a href="privacy.html" class="footer-nav-link">Privacy Policy</a>
+            <a href="refund.html" class="footer-nav-link">Refund Policy</a>
+          </div>
+          <div class="footer-nav-group">
+            <div class="footer-nav-label">Account</div>
+            <a href="login.html" class="footer-nav-link">Login</a>
+            <a href="signup.html" class="footer-nav-link">Sign Up</a>
+          </div>
+        </nav>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2026 FocusShield. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    // Interactive popup tabs
+    document.getElementById('btn-social').addEventListener('click', function() {
+      this.classList.add('active');
+      document.getElementById('btn-filters').classList.remove('active');
+      document.getElementById('mock-social-view').style.display = 'block';
+      document.getElementById('mock-filter-view').style.display = 'none';
+    });
+    document.getElementById('btn-filters').addEventListener('click', function() {
+      this.classList.add('active');
+      document.getElementById('btn-social').classList.remove('active');
+      document.getElementById('mock-social-view').style.display = 'none';
+      document.getElementById('mock-filter-view').style.display = 'block';
+    });
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(q => {
+      q.addEventListener('click', () => {
+        const item = q.parentElement;
+        const isOpen = item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+        if (!isOpen) item.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

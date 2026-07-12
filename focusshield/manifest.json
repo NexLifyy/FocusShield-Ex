@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "FocusShield — Block Online Distractions",
-  "version": "1.0.0",
-  "description": "Hide feeds, comments & recommendations on YouTube, Instagram, TikTok, Facebook, Twitter, Reddit & custom sites. Stay focused.",
+  "name": "FocusShield - Block Online Distractions",
+  "version": "3.5",
+  "description": "Block distracting content on social media and custom sites. Stay focused, browse smarter, reclaim your time.",
   "permissions": [
     "storage",
     "tabs",
     "activeTab",
-    "favicon"
+    "favicon",
+    "alarms"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -42,8 +43,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "blocked.html",
-        "blocked.js"
+        "hard-blocked.html",
+        "hard-blocked.js"
       ],
       "matches": [
         "<all_urls>"

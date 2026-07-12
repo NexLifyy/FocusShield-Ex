@@ -1,0 +1,22 @@
+# Design files
+Untitled-1.psd
+
+# Archives and build artifacts
+*.zip
+*.zip.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment / local config files
+.env
+.env.local
+.env.*.local
