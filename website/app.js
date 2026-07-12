@@ -26,9 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const supabaseAnonKey = 'sb_publishable_FwqzwLUMWBAAmp6IG75ocQ_0BbOqr_D';
   let supabaseClient = null;
 
+  console.log('[FocusShield] Initializing client auth engine...');
   if (window.supabase) {
-    supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-    window.supabaseClient = supabaseClient;
+    try {
+      supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+      window.supabaseClient = supabaseClient;
+      console.log('[FocusShield] Live Supabase client initialized successfully!');
+    } catch (e) {
+      console.error('[FocusShield] Failed to initialize Supabase client:', e);
+    }
+  } else {
+    console.warn('[FocusShield] window.supabase is undefined! Falling back to Mock Auth.');
   }
 
   // Setup shared mock & live authentication helpers
