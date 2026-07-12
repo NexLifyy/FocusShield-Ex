@@ -2828,34 +2828,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Account View Toggle Listeners ──
   const btnSettingsGoToAccount = document.getElementById('btn-settings-go-to-account');
   if (btnSettingsGoToAccount) {
-    btnSettingsGoToAccount.addEventListener('click', () => {
-      const nameSpan = document.getElementById('detail-platform-name');
-      if (nameSpan) nameSpan.textContent = 'Account & Sync';
-
-      const detailIcon = document.getElementById('detail-platform-icon');
-      if (detailIcon) {
-        detailIcon.style.display = 'flex';
-        detailIcon.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px rgba(61,220,132,0.3));">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-        `;
-      }
-
-      const toggleWrapper = document.getElementById('detail-platform-toggle-wrapper');
-      if (toggleWrapper) toggleWrapper.style.display = 'none';
-
-      const backText = document.getElementById('detail-back-text');
-      if (backText) backText.textContent = 'Back to Settings';
-
-      document.getElementById('subview-platform-options').style.display = 'none';
-      document.getElementById('subview-insights').style.display = 'none';
-      document.getElementById('subview-settings').style.display = 'none';
-      document.getElementById('subview-account').style.display = 'flex';
-
-      // Refresh account states in UI
-      updateAccountUI();
+    btnSettingsGoToAccount.addEventListener('click', async () => {
+      const user = await authService.getCurrentUser();
+      const targetUrl = user ? 'https://getfocusshield.site/account.html' : 'https://getfocusshield.site/signup.html';
+      chrome.tabs.create({ url: targetUrl });
     });
   }
 

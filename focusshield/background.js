@@ -741,3 +741,27 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 // Initialize on background load
 updateBadgeText();
+
+// ── SYNC AUTH SESSION FROM WEBSITE ──
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'SYNC_WEBSITE_SESSION') {
+    chrome.storage.local.set({ sessionUser: message.session }, () => {
+      console.log('[Background] Synced session from website:', message.session);
+      chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: { sessionUser: message.session } }, () => {
+        if (chrome.runtime.lastError) { /* ignore if popup is closed */ }
+      });
+      sendResponse({ success: true });
+    });
+    return true;
+  }
+  if (message.type === 'CLEAR_WEBSITE_SESSION') {
+    chrome.storage.local.remove(['sessionUser'], () => {
+      console.log('[Background] Cleared session (website logout)');
+      chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: { sessionUser: null } }, () => {
+        if (chrome.runtime.lastError) { /* ignore if popup is closed */ }
+      });
+      sendResponse({ success: true });
+    });
+    return true;
+  }
+});

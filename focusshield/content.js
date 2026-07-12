@@ -2192,4 +2192,43 @@
     }
   }, 2000);
 
+  // ── Sync Website Auth State to Chrome Extension ──
+  const syncHostname = window.location.hostname.toLowerCase();
+  if (syncHostname.includes('getfocusshield.site') || syncHostname.includes('localhost') || syncHostname.includes('127.0.0.1')) {
+    let lastSyncedSessionStr = null;
+    
+    function syncSessionWithExtension() {
+      try {
+        const sessionStr = localStorage.getItem('focusshield_mock_session');
+        if (sessionStr !== lastSyncedSessionStr) {
+          lastSyncedSessionStr = sessionStr;
+          if (sessionStr) {
+            const session = JSON.parse(sessionStr);
+            chrome.runtime.sendMessage({
+              type: 'SYNC_WEBSITE_SESSION',
+              session: {
+                uid: session.uid,
+                email: session.email,
+                fullName: session.fullName || '',
+                isPremium: !!session.isPremium
+              }
+            }, () => {
+              if (chrome.runtime.lastError) { /* ignore mismatch runtime errors */ }
+            });
+          } else {
+            chrome.runtime.sendMessage({ type: 'CLEAR_WEBSITE_SESSION' }, () => {
+              if (chrome.runtime.lastError) { /* ignore mismatch runtime errors */ }
+            });
+          }
+        }
+      } catch (e) {
+        // Silent catch for restricted iframe or storage permissions
+      }
+    }
+    
+    // Check on load and periodically
+    syncSessionWithExtension();
+    setInterval(syncSessionWithExtension, 1000);
+  }
+
 })();
