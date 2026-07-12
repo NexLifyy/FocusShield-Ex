@@ -68,14 +68,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (error) throw error;
         if (!data.user) throw new Error('Sign up failed.');
         
+        const isConfirmed = !!data.session;
         const newUser = {
           uid: data.user.id,
           email: data.user.email,
           fullName: fullName,
-          isPremium: false
+          isPremium: false,
+          isConfirmed: isConfirmed
         };
-        localStorage.setItem('focusshield_mock_session', JSON.stringify(newUser));
-        this.broadcastSession(newUser);
+        
+        // Only set session if the account is confirmed
+        if (isConfirmed) {
+          localStorage.setItem('focusshield_mock_session', JSON.stringify(newUser));
+          this.broadcastSession(newUser);
+        }
         return newUser;
       } else {
         // Fallback to Mock
@@ -89,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
           password: password,
           fullName: fullName,
           isPremium: false,
+          isConfirmed: true,
           backups: []
         };
         users.push(newUser);

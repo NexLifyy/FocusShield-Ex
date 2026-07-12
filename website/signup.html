@@ -691,8 +691,32 @@
 
         try {
           if (window.authEngine) {
-            await window.authEngine.signUp(email, password, name);
-            window.location.href = 'account.html';
+            const user = await window.authEngine.signUp(email, password, name);
+            if (user.isConfirmed) {
+              window.location.href = 'account.html';
+            } else {
+              // Hide form and show a beautiful confirmation message box
+              signupForm.style.display = 'none';
+              const divider = document.querySelector('.auth-divider');
+              const googleBtn = document.getElementById('google-signup-btn');
+              if (divider) divider.style.display = 'none';
+              if (googleBtn) googleBtn.style.display = 'none';
+              
+              const messageBox = document.createElement('div');
+              messageBox.innerHTML = `
+                <div style="text-align: center; padding: 32px 24px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 16px; margin-top: 10px;">
+                  <div style="width: 56px; height: 56px; background: rgba(16, 185, 129, 0.15); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  </div>
+                  <h3 style="color: var(--text-1); font-size: 20px; font-weight: 700; margin-bottom: 8px;">Check your email</h3>
+                  <p style="color: var(--text-2); font-size: 14px; line-height: 1.6; margin-bottom: 24px;">We've sent a verification link to <strong style="color: var(--text-1);">${email}</strong>.<br>Please click the link in that email to confirm your account.</p>
+                  <a href="login.html" class="auth-btn" style="text-decoration: none; display: inline-flex; justify-content: center; align-items: center; font-weight: 600; width: 100%;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Proceed to Sign In
+                  </a>
+                </div>
+              `;
+              signupForm.parentNode.appendChild(messageBox);
+            }
           } else {
             throw new Error('Auth engine not loaded yet. Try again.');
           }
