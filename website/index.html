@@ -697,8 +697,20 @@
         <a href="login.html" class="nav-login">Login</a>
         <a href="signup.html" class="nav-signup">Sign Up</a>
       </div>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </header>
+  <nav class="mobile-menu" id="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="pricing.html">Pricing</a>
+    <div class="mobile-menu-divider"></div>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="mobile-signup">Sign Up Free</a>
+  </nav>
 
   <!-- â•â•â• HERO SECTION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <main>
@@ -1708,6 +1720,18 @@
   </footer>
 
   <script src="app.js?v=4"></script>
+  <script>
+    (function(){
+      var toggle = document.getElementById('nav-toggle');
+      var menu = document.getElementById('mobile-menu');
+      if (toggle && menu) {
+        toggle.addEventListener('click', function(){
+          toggle.classList.toggle('open');
+          menu.classList.toggle('open');
+        });
+      }
+    })();
+  </script>
   <script>
     // Interactive popup tabs
     const btnSocial = document.getElementById('btn-social');
