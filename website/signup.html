@@ -598,6 +598,16 @@
         <!-- Signup Form -->
         <form id="signup-form">
           <div class="auth-field">
+            <label for="name">Full Name</label>
+            <div class="auth-input-wrap">
+              <span class="auth-input-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <input type="text" id="name" class="auth-input" required placeholder="John Doe">
+            </div>
+          </div>
+
+          <div class="auth-field">
             <label for="email">Email Address</label>
             <div class="auth-input-wrap">
               <span class="auth-input-icon">
@@ -675,12 +685,13 @@
         submitBtn.textContent = 'Creating account…';
         submitBtn.disabled = true;
 
+        const name     = document.getElementById('name').value.trim();
         const email    = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
 
         try {
           if (window.authEngine) {
-            await window.authEngine.signUp(email, password);
+            await window.authEngine.signUp(email, password, name);
             window.location.href = 'account.html';
           } else {
             throw new Error('Auth engine not loaded yet. Try again.');

@@ -45,14 +45,15 @@ document.addEventListener('DOMContentLoaded', () => {
       return JSON.parse(localStorage.getItem('focusshield_mock_session') || 'null');
     },
 
-    async signUp(email, password) {
+    async signUp(email, password, fullName = '') {
       if (supabaseClient) {
         const { data, error } = await supabaseClient.auth.signUp({
           email,
           password,
           options: {
             data: {
-              is_premium: false
+              is_premium: false,
+              full_name: fullName
             }
           }
         });
@@ -62,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const newUser = {
           uid: data.user.id,
           email: data.user.email,
+          fullName: fullName,
           isPremium: false
         };
         localStorage.setItem('focusshield_mock_session', JSON.stringify(newUser));
@@ -77,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
           uid: 'web-uid-' + Math.random().toString(36).substr(2, 9),
           email: email,
           password: password,
+          fullName: fullName,
           isPremium: false,
           backups: []
         };
