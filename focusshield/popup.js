@@ -2776,7 +2776,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (loggedInCard) loggedInCard.style.display = 'flex';
       
       const emailEl = document.getElementById('account-email');
-      if (emailEl) emailEl.textContent = user.email;
+      if (emailEl) emailEl.textContent = user.fullName || user.email;
       
       const badge = document.getElementById('account-badge');
       if (badge) {
@@ -2788,8 +2788,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (promoCard) promoCard.style.display = user.isPremium ? 'none' : 'flex';
       
       if (settingsAccountTitle) {
-        const username = user.email.split('@')[0];
-        settingsAccountTitle.textContent = username.charAt(0).toUpperCase() + username.slice(1);
+        if (user.fullName) {
+          settingsAccountTitle.textContent = user.fullName;
+        } else {
+          const username = user.email.split('@')[0];
+          settingsAccountTitle.textContent = username.charAt(0).toUpperCase() + username.slice(1);
+        }
       }
       if (settingsAccountStatus) {
         settingsAccountStatus.style.display = 'block';

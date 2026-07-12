@@ -118,9 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
           .maybeSingle();
 
         const isPremium = profile ? profile.is_premium : false;
+        const fullName = data.user.user_metadata ? (data.user.user_metadata.full_name || '') : '';
         const loggedUser = {
           uid: data.user.id,
           email: data.user.email,
+          fullName: fullName,
           isPremium: isPremium
         };
         localStorage.setItem('focusshield_mock_session', JSON.stringify(loggedUser));
