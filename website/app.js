@@ -242,11 +242,12 @@ function updateNavbarAuthUI() {
   const user = window.authEngine ? window.authEngine.getCurrentUser() : JSON.parse(localStorage.getItem('focusshield_mock_session') || 'null');
   
   if (user) {
-    const name = user.email.split('@')[0];
-    const capitalized = name.charAt(0).toUpperCase() + name.slice(1);
+    const displayName = user.fullName || user.email.split('@')[0];
+    const capitalized = user.fullName ? user.fullName : displayName.charAt(0).toUpperCase() + displayName.slice(1);
+    const initial = capitalized.charAt(0).toUpperCase();
     navActions.innerHTML = `
       <a href="account.html" class="btn btn-secondary" style="display:flex; align-items:center; gap:8px;">
-        <div style="width:20px; height:20px; border-radius:50%; background:var(--accent); color:#000; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center;">${user.email.charAt(0).toUpperCase()}</div>
+        <div style="width:20px; height:20px; border-radius:50%; background:var(--accent); color:#000; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center;">${initial}</div>
         <span>${capitalized}</span>
       </a>
       <button onclick="window.authEngine.logout()" class="btn btn-secondary">Logout</button>
