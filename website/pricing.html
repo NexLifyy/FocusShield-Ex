@@ -199,7 +199,7 @@
             <button type="button" class="sw-btn" data-type="lifetime" onclick="selectProPlan('lifetime')">Lifetime</button>
           </div>
           <div class="pc-price" id="pro-price-num"><sup>$</sup>1.99<span class="per">/mo</span></div>
-          <div class="pc-sub" id="pro-billing-sub">Billed yearly ($23.88/yr) &mdash; includes 7-day free trial</div>
+          <div class="pc-sub" id="pro-billing-sub">Billed yearly ($23.88/yr) &mdash; cancel anytime</div>
           <div class="card-divider"></div>
           <ul class="card-features">
             <li><span class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Unlimited blocked websites</li>
@@ -307,7 +307,6 @@
       <p>Join thousands of professionals who take their focus seriously. Begin free, upgrade whenever you are ready.</p>
       <div class="upgrade-btns">
         <a href="signup.html" class="btn btn-primary" style="padding:14px 36px;font-size:15px;">Start 7-Day Free Trial</a>
-        <a href="signup.html" class="btn btn-secondary" style="padding:14px 30px;font-size:15px;">Get Started Free</a>
       </div>
     </div>
   </div>
@@ -414,7 +413,7 @@
   <script>
     const proPricing = {
       monthly:  { html: '<sup>$</sup>2.99<span class="per">/mo</span>',  billing: 'Billed monthly &mdash; cancel anytime',              cta: 'Get Pro Monthly',        planName: 'Pro Monthly Plan',  priceVal: '$2.99/mo',  popular: false },
-      yearly:   { html: '<!-- price-num --><sup>$</sup>1.99<span class="per">/mo</span>', billing: 'Billed yearly ($23.88/yr) &mdash; includes 7-day free trial', cta: 'Start 7-Day Free Trial', planName: 'Pro Yearly Plan',   priceVal: '$23.88/yr', popular: true  },
+      yearly:   { html: '<!-- price-num --><sup>$</sup>1.99<span class="per">/mo</span>', billing: 'Billed yearly ($23.88/yr) &mdash; cancel anytime', cta: 'Start 7-Day Free Trial', planName: 'Pro Yearly Plan',   priceVal: '$23.88/yr', popular: true  },
       lifetime: { html: '<sup>$</sup>49.99<span class="per"></span>',    billing: 'One-time payment &mdash; lifetime updates',            cta: 'Buy Lifetime Pro',       planName: 'Pro Lifetime Plan', priceVal: '$49.99',    popular: false }
     };
     function selectProPlan(type) {
