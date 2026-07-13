@@ -20,3 +20,6 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+
+# Chrome Extension folder (local only)
+focusshield/
