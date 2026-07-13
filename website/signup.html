@@ -694,12 +694,7 @@
         errorMsg.style.display = 'none';
         try {
           if (window.authEngine) {
-            try {
-              await window.authEngine.signUp('google.user@gmail.com', 'google-auth-pass-998');
-            } catch (_) {
-              await window.authEngine.login('google.user@gmail.com', 'google-auth-pass-998');
-            }
-            window.location.href = 'account.html';
+            await window.authEngine.loginWithGoogle();
           } else {
             throw new Error('Auth engine not loaded yet. Try again.');
           }

@@ -138,6 +138,20 @@
   <script src="app.js?v=4"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // If we have a hash parameter in URL (e.g. access_token from OAuth), wait for Supabase to handle it
+      if (window.location.hash || window.location.href.includes('error=')) {
+        console.log('[FocusShield] OAuth callback detected, waiting for session resolution...');
+        setTimeout(() => {
+          const user = JSON.parse(localStorage.getItem('focusshield_mock_session') || 'null');
+          if (!user) {
+            window.location.href = 'login.html';
+          } else {
+            window.location.reload(); // Refresh to render the new session
+          }
+        }, 1500);
+        return;
+      }
+
       const user = JSON.parse(localStorage.getItem('focusshield_mock_session') || 'null');
       if (!user) {
         // Force redirect to login page if no active user session exists

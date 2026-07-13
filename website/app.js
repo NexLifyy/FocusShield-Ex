@@ -32,6 +32,47 @@ document.addEventListener('DOMContentLoaded', () => {
       supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
       window.supabaseClient = supabaseClient;
       console.log('[FocusShield] Live Supabase client initialized successfully!');
+
+      // Set up automatic Google OAuth hash session processing
+      supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        console.log('[FocusShield] Supabase Auth event:', event);
+        if (session && session.user) {
+          // Retrieve current user details from metadata
+          const fullName = session.user.user_metadata ? (session.user.user_metadata.full_name || '') : '';
+          
+          // Get premium status dynamically from database table
+          const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('is_premium')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          const isPremium = profile ? profile.is_premium : false;
+          
+          const loggedUser = {
+            uid: session.user.id,
+            email: session.user.email,
+            fullName: fullName,
+            isPremium: isPremium
+          };
+          localStorage.setItem('focusshield_mock_session', JSON.stringify(loggedUser));
+          if (window.authEngine && window.authEngine.broadcastSession) {
+            window.authEngine.broadcastSession(loggedUser);
+          }
+          
+          // Redirect to account page if user completes OAuth login/signup on auth pages
+          const path = window.location.pathname;
+          if (path.endsWith('login.html') || path.endsWith('signup.html')) {
+            console.log('[FocusShield] OAuth resolved. Redirecting user to account...');
+            window.location.href = 'account.html';
+          }
+        } else if (event === 'SIGNED_OUT') {
+          localStorage.removeItem('focusshield_mock_session');
+          if (window.authEngine && window.authEngine.broadcastSession) {
+            window.authEngine.broadcastSession(null);
+          }
+        }
+      });
     } catch (e) {
       console.error('[FocusShield] Failed to initialize Supabase client:', e);
     }
@@ -138,6 +179,33 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('focusshield_mock_session', JSON.stringify(user));
         this.broadcastSession(user);
         return user;
+      }
+    },
+
+    async loginWithGoogle() {
+      if (supabaseClient) {
+        // Build robust redirection path pointing to account.html in the same web folder
+        const redirectUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/account.html');
+        console.log('[FocusShield] Triggering Google OAuth with redirect:', redirectUrl);
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: redirectUrl
+          }
+        });
+        if (error) throw error;
+      } else {
+        // Local preview/fallback mock login
+        console.log('[FocusShield] Supabase client absent. Simulating Mock Google Sign-In...');
+        const mockUser = {
+          uid: 'mock-google-' + Math.random().toString(36).substr(2, 9),
+          email: 'google.user@gmail.com',
+          fullName: 'Google User',
+          isPremium: false
+        };
+        localStorage.setItem('focusshield_mock_session', JSON.stringify(mockUser));
+        this.broadcastSession(mockUser);
+        window.location.href = 'account.html';
       }
     },
 
