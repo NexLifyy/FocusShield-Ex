@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FocusShield: Block Distractions & Reclaim Deep Focus</title>
   <meta name="description" content="FocusShield is a powerful Chrome extension that blocks social media, sets automated focus schedules, and tracks your productivity streaks. Get more done, every day.">
-  <link rel="stylesheet" href="styles.css?v=1.5">
+  <link rel="stylesheet" href="styles.css?v=1.6">
   <style>
     /* â”€â”€â”€ Landing Page Exclusive Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
@@ -367,12 +367,7 @@
     }
     .feature-row.flip { direction: rtl; }
     .feature-row.flip > * { direction: ltr; }
-    .feature-text { direction: ltr; }
-    .feature-text .section-eyebrow,
-    .feature-text .section-title,
-    .feature-text .section-sub,
-    .feature-text .feature-list,
-    .feature-text .feature-list li { direction: ltr; text-align: left; }
+    .feature-text {}
     .feature-text .section-eyebrow { margin-bottom: 10px; }
     .feature-text .section-title { font-size: 32px; margin-bottom: 14px; }
     .feature-text .section-sub { font-size: 15px; margin-bottom: 28px; }
@@ -759,7 +754,7 @@
     }
 
     @media (max-width: 900px) {
-      /* Switch from grid to flex column so ALL 5 feature cards are identical width */
+      /* Stack feature cards to single column on mobile */
       .feature-row,
       .feature-row.flip {
         display: flex !important;
@@ -769,7 +764,6 @@
         width: 100% !important;
         box-sizing: border-box !important;
       }
-      /* Both children (text + visual) fill full width */
       .feature-row > *,
       .feature-row.flip > * {
         width: 100% !important;
@@ -777,7 +771,6 @@
         text-align: left !important;
         box-sizing: border-box !important;
       }
-      /* Force left-align on all text inside feature-text */
       .feature-text,
       .feature-text .section-eyebrow,
       .feature-text .section-title,
@@ -785,7 +778,6 @@
       .feature-text .feature-list,
       .feature-text .feature-list li { direction: ltr !important; text-align: left !important; }
       .feature-text .section-sub { max-width: 100% !important; }
-      /* Visual card fills full width */
       .feature-visual,
       .visual-double-col,
       .visual-standard-col,
@@ -1116,10 +1108,10 @@
       <!-- Feature 2: Social Media (Platform Blocking) -->
       <div class="section">
         <div class="feature-row flip">
-          <div class="feature-text" style="text-align:left;direction:ltr;">
-            <div class="section-eyebrow" style="text-align:left;">Platform Shielding</div>
-            <h2 class="section-title" style="text-align:left;">Manage social platforms <span>in one click</span></h2>
-            <p class="section-sub" style="text-align:left;max-width:100%;">YouTube, Instagram, Facebook, TikTok, Reddit, X: toggle them all off with a single switch. No more accidental scrolling derailing your deep-work sessions.</p>
+          <div class="feature-text">
+            <div class="section-eyebrow">Platform Shielding</div>
+            <h2 class="section-title">Manage social platforms <span>in one click</span></h2>
+            <p class="section-sub">YouTube, Instagram, Facebook, TikTok, Reddit, X: toggle them all off with a single switch. No more accidental scrolling derailing your deep-work sessions.</p>
             <ul class="feature-list">
               <li>
                 <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
@@ -1311,14 +1303,15 @@
           </div>
         </div>
       </div>
+      </div>
 
       <!-- Feature 3: Smart Filters -->
       <div class="section">
         <div class="feature-row">
-          <div class="feature-text" style="text-align:left;direction:ltr;">
-            <div class="section-eyebrow" style="text-align:left;">Smart Filter Blocking</div>
-            <h2 class="section-title" style="text-align:left;">Block by <span>category, not just URL</span></h2>
-            <p class="section-sub" style="text-align:left;max-width:100%;">Don't want to block a specific site, just an entire type of content? FocusShield's smart filter engine lets you block whole categories at once.</p>
+          <div class="feature-text">
+            <div class="section-eyebrow">Smart Filter Blocking</div>
+            <h2 class="section-title">Block by <span>category, not just URL</span></h2>
+            <p class="section-sub">Don't want to block a specific site, just an entire type of content? FocusShield's smart filter engine lets you block whole categories at once.</p>
             <ul class="feature-list">
               <li>
                 <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
@@ -1436,14 +1429,15 @@
           </div>
         </div>
       </div>
+      </div>
 
       <!-- Feature 4: Schedules -->
       <div class="section">
         <div class="feature-row flip">
-          <div class="feature-text" style="text-align:left;direction:ltr;">
-            <div class="section-eyebrow" style="text-align:left;">Smart Scheduling</div>
-            <h2 class="section-title" style="text-align:left;">Set it once. <span>Stay focused automatically.</span></h2>
-            <p class="section-sub" style="text-align:left;max-width:100%;">Create recurring work schedules that automatically activate your block lists. Whether it's Mon-Fri 9 AM or Pomodoro-style intervals, FocusShield enforces them without you lifting a finger.</p>
+          <div class="feature-text">
+            <div class="section-eyebrow">Smart Scheduling</div>
+            <h2 class="section-title">Set it once. <span>Stay focused automatically.</span></h2>
+            <p class="section-sub">Create recurring work schedules that automatically activate your block lists. Whether it's Mon-Fri 9 AM or Pomodoro-style intervals, FocusShield enforces them without you lifting a finger.</p>
             <ul class="feature-list">
               <li>
                 <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
@@ -1531,14 +1525,15 @@
           </div>
         </div>
       </div>
+      </div>
 
       <!-- Feature 5: Analytics -->
       <div class="section">
         <div class="feature-row">
-          <div class="feature-text" style="text-align:left;direction:ltr;">
-            <div class="section-eyebrow" style="text-align:left;">Focus Analytics</div>
-            <h2 class="section-title" style="text-align:left;">See your <span>productivity grow</span> over time</h2>
-            <p class="section-sub" style="text-align:left;max-width:100%;">Track how many hours you saved this week, your longest focus streak, and which days you were most productive. Data that motivates you to keep going.</p>
+          <div class="feature-text">
+            <div class="section-eyebrow">Focus Analytics</div>
+            <h2 class="section-title">See your <span>productivity grow</span> over time</h2>
+            <p class="section-sub">Track how many hours you saved this week, your longest focus streak, and which days you were most productive. Data that motivates you to keep going.</p>
             <ul class="feature-list">
               <li>
                 <span class="check"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
