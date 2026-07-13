@@ -861,6 +861,11 @@ footer {
   border-bottom: 1px solid var(--border);
   padding: 16px 24px 24px;
   gap: 6px;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  z-index: 999;
 }
 
 .mobile-menu.open { display: flex; }
