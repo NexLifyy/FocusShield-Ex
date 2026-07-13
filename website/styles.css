@@ -1077,3 +1077,38 @@ footer {
   .footer-nav-group { min-width: 100%; }
 }
 
+/* ════════════════════════════════════════════
+   FEATURE CARDS — MOBILE TEXT ALIGNMENT FIX
+   ════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .section .feature-row,
+  .section .feature-row.flip {
+    grid-template-columns: 1fr !important;
+    direction: ltr !important;
+  }
+
+  .section .feature-row .feature-text,
+  .section .feature-row.flip .feature-text {
+    direction: ltr !important;
+    text-align: left !important;
+  }
+
+  .section .feature-row .feature-text *,
+  .section .feature-row.flip .feature-text * {
+    direction: ltr !important;
+    text-align: left !important;
+  }
+
+  .section .feature-row .section-sub,
+  .section .feature-row.flip .section-sub {
+    max-width: 100% !important;
+  }
+
+  .section .feature-visual,
+  .section .visual-double-col,
+  .section .visual-standard-col,
+  .section .visual-narrow-col {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
