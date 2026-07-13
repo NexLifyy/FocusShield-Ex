@@ -38,6 +38,11 @@
   padding: 0;
 }
 
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   background-color: var(--bg);
   background-image: 
@@ -53,6 +58,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* ════════════════════════════════════════════
