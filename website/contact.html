@@ -10,23 +10,12 @@
   <style>
     /* Contact Page Layout */
     .contact-container {
-      max-width: 900px;
+      max-width: 560px;
       margin: 80px auto 100px;
       padding: 0 24px;
     }
     
-    .contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 48px;
-      margin-top: 48px;
-    }
-    
     @media (max-width: 768px) {
-      .contact-grid {
-        grid-template-columns: 1fr;
-        gap: 36px;
-      }
       .contact-container {
         margin: 40px auto 60px;
       }
@@ -240,41 +229,15 @@
     <a href="signup.html" class="mobile-signup">Sign Up Free</a>
   </nav>
 
-  <!-- Main Grid Container -->
+  <!-- Main Contact Container -->
   <main class="contact-container">
-    <div style="text-align: center;">
+    <div style="text-align: center; margin-bottom: 40px;">
       <h1 style="font-family: var(--font-headings); font-size: clamp(32px, 5vw, 48px); font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -1.5px;">Get in <span>touch</span></h1>
       <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto; font-size: 15px; line-height: 1.6;">Have questions, feature requests, or need technical help? We are here to support you.</p>
     </div>
 
-    <div class="contact-grid">
-      <!-- Info Column -->
-      <div class="contact-info">
-        <div class="info-card">
-          <div class="info-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </div>
-          <div class="info-details">
-            <h3>Email Support</h3>
-            <p>Direct support response within 24 hours.</p>
-            <a href="mailto:support@getfocusschield.site">support@getfocusschield.site</a>
-          </div>
-        </div>
-
-        <div class="info-card">
-          <div class="info-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </div>
-          <div class="info-details">
-            <h3>Knowledge Base</h3>
-            <p>Find answers to common setup questions instantly.</p>
-            <a href="pricing.html#faq">Read FAQs &rarr;</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Form Column -->
-      <div class="contact-form-card">
+      <!-- Form -->
+      <div class="contact-form-card" style="margin-bottom: 60px;">
         <!-- Form Content -->
         <form id="contact-form" action="https://api.web3forms.com/submit" method="POST">
           <input type="hidden" name="access_key" value="968a5183-f81d-48c3-a535-24b7abcdd889">
@@ -321,8 +284,6 @@
           <p style="color: var(--text-secondary); font-size: 14.5px; line-height: 1.6; margin-bottom: 24px;">Thank you for reaching out. Your message has been sent successfully. We will get back to you as soon as possible.</p>
           <a href="index.html" class="btn btn-secondary" style="padding: 10px 24px; font-size: 13.5px; display: inline-block; text-decoration: none;">Return to Home</a>
         </div>
-      </div>
-    </div>
   </main>
 
   <!-- Footer -->
