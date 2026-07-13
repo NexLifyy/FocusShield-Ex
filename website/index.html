@@ -759,10 +759,25 @@
     }
 
     @media (max-width: 900px) {
+      /* Switch from grid to flex column so ALL 5 feature cards are identical width */
       .feature-row,
-      .feature-row.flip { grid-template-columns: 1fr !important; gap: 40px !important; direction: ltr !important; }
+      .feature-row.flip {
+        display: flex !important;
+        flex-direction: column !important;
+        direction: ltr !important;
+        gap: 40px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      /* Both children (text + visual) fill full width */
       .feature-row > *,
-      .feature-row.flip > * { direction: ltr !important; text-align: left !important; }
+      .feature-row.flip > * {
+        width: 100% !important;
+        direction: ltr !important;
+        text-align: left !important;
+        box-sizing: border-box !important;
+      }
+      /* Force left-align on all text inside feature-text */
       .feature-text,
       .feature-text .section-eyebrow,
       .feature-text .section-title,
@@ -770,10 +785,11 @@
       .feature-text .feature-list,
       .feature-text .feature-list li { direction: ltr !important; text-align: left !important; }
       .feature-text .section-sub { max-width: 100% !important; }
+      /* Visual card fills full width */
       .feature-visual,
       .visual-double-col,
       .visual-standard-col,
-      .visual-narrow-col { max-width: 100% !important; width: 100% !important; margin: 0 auto !important; }
+      .visual-narrow-col { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
       .how-steps { grid-template-columns: 1fr; }
       .how-steps::before { display: none; }
       .testimonials-grid { grid-template-columns: 1fr; }

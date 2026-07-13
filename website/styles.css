@@ -1078,13 +1078,25 @@ footer {
 }
 
 /* ════════════════════════════════════════════
-   FEATURE CARDS — MOBILE TEXT ALIGNMENT FIX
+   FEATURE CARDS — MOBILE LAYOUT FIX
    ════════════════════════════════════════════ */
 @media (max-width: 900px) {
   .section .feature-row,
   .section .feature-row.flip {
-    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
     direction: ltr !important;
+    gap: 40px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .section .feature-row > *,
+  .section .feature-row.flip > * {
+    width: 100% !important;
+    direction: ltr !important;
+    text-align: left !important;
+    box-sizing: border-box !important;
   }
 
   .section .feature-row .feature-text,
@@ -1110,5 +1122,6 @@ footer {
   .section .visual-narrow-col {
     max-width: 100% !important;
     width: 100% !important;
+    margin: 0 !important;
   }
 }
