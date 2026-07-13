@@ -677,7 +677,7 @@
         try {
           if (window.authEngine) {
             await window.authEngine.login(email, password);
-            window.location.href = 'account.html';
+            window.location.href = 'index.html';
           } else {
             throw new Error('Auth engine not loaded yet. Try again.');
           }

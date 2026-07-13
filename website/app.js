@@ -60,11 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
             window.authEngine.broadcastSession(loggedUser);
           }
           
-          // Redirect to account page if user completes OAuth login/signup on auth pages
+          // Redirect to home page if user completes OAuth login/signup on auth pages
           const path = window.location.pathname;
           if (path.endsWith('login.html') || path.endsWith('signup.html')) {
-            console.log('[FocusShield] OAuth resolved. Redirecting user to account...');
-            window.location.href = 'account.html';
+            console.log('[FocusShield] OAuth resolved. Redirecting user to home page...');
+            window.location.href = 'index.html';
           }
         } else if (event === 'SIGNED_OUT') {
           localStorage.removeItem('focusshield_mock_session');
@@ -184,8 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async loginWithGoogle() {
       if (supabaseClient) {
-        // Build robust redirection path pointing to account.html in the same web folder
-        const redirectUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/account.html');
+        // Build robust redirection path pointing to index.html in the same web folder
+        const redirectUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/index.html');
         console.log('[FocusShield] Triggering Google OAuth with redirect:', redirectUrl);
         const { error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         localStorage.setItem('focusshield_mock_session', JSON.stringify(mockUser));
         this.broadcastSession(mockUser);
-        window.location.href = 'account.html';
+        window.location.href = 'index.html';
       }
     },
 
