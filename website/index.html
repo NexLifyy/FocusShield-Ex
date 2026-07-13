@@ -367,7 +367,12 @@
     }
     .feature-row.flip { direction: rtl; }
     .feature-row.flip > * { direction: ltr; }
-    .feature-text {}
+    .feature-text { direction: ltr; }
+    .feature-text .section-eyebrow,
+    .feature-text .section-title,
+    .feature-text .section-sub,
+    .feature-text .feature-list,
+    .feature-text .feature-list li { direction: ltr; text-align: left; }
     .feature-text .section-eyebrow { margin-bottom: 10px; }
     .feature-text .section-title { font-size: 32px; margin-bottom: 14px; }
     .feature-text .section-sub { font-size: 15px; margin-bottom: 28px; }
@@ -754,11 +759,16 @@
     }
 
     @media (max-width: 900px) {
-      .feature-row { grid-template-columns: 1fr !important; gap: 40px !important; direction: ltr !important; }
-      .feature-row.flip { direction: ltr !important; }
-      .feature-row > *, .feature-row.flip > * { direction: ltr !important; text-align: left !important; }
-      .feature-text { text-align: left !important; width: 100% !important; }
-      .feature-text * { text-align: left !important; }
+      .feature-row,
+      .feature-row.flip { grid-template-columns: 1fr !important; gap: 40px !important; direction: ltr !important; }
+      .feature-row > *,
+      .feature-row.flip > * { direction: ltr !important; text-align: left !important; }
+      .feature-text,
+      .feature-text .section-eyebrow,
+      .feature-text .section-title,
+      .feature-text .section-sub,
+      .feature-text .feature-list,
+      .feature-text .feature-list li { direction: ltr !important; text-align: left !important; }
       .feature-visual { max-width: 440px !important; width: 100% !important; margin: 0 auto !important; }
       .how-steps { grid-template-columns: 1fr; }
       .how-steps::before { display: none; }
