@@ -2894,7 +2894,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnSettingsGoToAccount) {
     btnSettingsGoToAccount.addEventListener('click', async () => {
       const user = await authService.getCurrentUser();
-      const targetUrl = user ? 'https://getfocusshield.site/account.html' : 'https://getfocusshield.site/signup.html';
+      const targetUrl = user ? 'https://getfocusshield.site/account.html' : 'https://getfocusshield.site/signup.html?redirect=account';
       chrome.tabs.create({ url: targetUrl });
     });
   }

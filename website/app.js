@@ -1,5 +1,13 @@
 // FocusShield Companion Website Interactivity & Auth Engine
 document.addEventListener('DOMContentLoaded', () => {
+  // Parse redirect query parameter if present and store in sessionStorage
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirectParam = urlParams.get('redirect');
+  if (redirectParam === 'account') {
+    console.log('[FocusShield] Found redirect parameter, saving redirect target: account.html');
+    sessionStorage.setItem('auth_redirect', 'account.html');
+  }
+
   // Initialize FAQ accordions
   const faqQuestions = document.querySelectorAll('.faq-question');
   faqQuestions.forEach(question => {
@@ -60,11 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
             window.authEngine.broadcastSession(loggedUser);
           }
           
-          // Redirect to home page if user completes OAuth login/signup on auth pages
+          // Redirect logic: check if there's a saved auth_redirect target
+          const redirectTarget = sessionStorage.getItem('auth_redirect');
           const path = window.location.pathname;
-          if (path.endsWith('login.html') || path.endsWith('signup.html')) {
-            console.log('[FocusShield] OAuth resolved. Redirecting user to home page...');
-            window.location.href = 'index.html';
+          
+          if (redirectTarget) {
+            console.log('[FocusShield] OAuth resolved. Redirecting to target:', redirectTarget);
+            sessionStorage.removeItem('auth_redirect');
+            window.location.href = redirectTarget;
+          } else if (path.endsWith('login.html') || path.endsWith('signup.html')) {
+            console.log('[FocusShield] OAuth resolved. Redirecting user to account page...');
+            window.location.href = 'account.html';
           }
         } else if (event === 'SIGNED_OUT') {
           localStorage.removeItem('focusshield_mock_session');
@@ -184,8 +198,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async loginWithGoogle() {
       if (supabaseClient) {
-        // Build robust redirection path pointing to index.html in the same web folder
-        const redirectUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/index.html');
+        // Build robust redirection path pointing to account.html in the same web folder
+        const redirectUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/account.html');
         console.log('[FocusShield] Triggering Google OAuth with redirect:', redirectUrl);
         const { error } = await supabaseClient.auth.signInWithOAuth({
           provider: 'google',
@@ -205,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         localStorage.setItem('focusshield_mock_session', JSON.stringify(mockUser));
         this.broadcastSession(mockUser);
-        window.location.href = 'index.html';
+        window.location.href = 'account.html';
       }
     },
 
