@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusShield — Blocked</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Design Tokens ──────────────────────────── */
+    :root {
+      --bg:         #07070b;
+      --accent:     #3ddc84;
+      --accent-glow:rgba(61, 220, 132, 0.18);
+      --text:       #f0f0f4;
+      --text-2:     #8888a0;
+      --text-3:     #444456;
+      --border:     rgba(255,255,255,0.07);
+      --card-bg:    rgba(255,255,255,0.04);
+      --danger:     #f05454;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+
+    /* ─── Ambient Background ─────────────────────── */
+    .bg-ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0;
+      animation: orb-fade-in 1.4s ease forwards;
+    }
+
+    .bg-orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(61,220,132,0.08) 0%, transparent 65%);
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation-delay: 0.3s;
+    }
+
+    .bg-orb-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(61,220,132,0.05) 0%, transparent 65%);
+      bottom: -80px;
+      right: -100px;
+      animation-delay: 0.6s;
+    }
+
+    .bg-orb-3 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(120,80,220,0.04) 0%, transparent 65%);
+      bottom: 20%;
+      left: -80px;
+      animation-delay: 0.9s;
+    }
+
+    @keyframes orb-fade-in {
+      to { opacity: 1; }
+    }
+
+    /* Subtle grid overlay */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 100%);
+    }
+
+    /* ─── Brand Watermark ────────────────────────── */
+    .watermark {
+      position: fixed;
+      top: 28px;
+      left: 36px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+      opacity: 0;
+      animation: fade-up 0.6s ease 0.1s forwards;
+    }
+
+    .watermark-shield {
+      filter: drop-shadow(0 0 8px rgba(61,220,132,0.5));
+    }
+
+    .watermark-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    /* ─── Main Content ───────────────────────────── */
+    .main-content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 620px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      text-align: center;
+    }
+
+    /* ─── Icon Container ─────────────────────────── */
+    .icon-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 36px;
+      opacity: 0;
+      animation: scale-in 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s forwards;
+    }
+
+    .icon-rings {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    .icon-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(61,220,132,0.15);
+      animation: ring-pulse 3s ease-in-out infinite;
+    }
+
+    .icon-ring:nth-child(1) {
+      inset: 8px;
+      animation-delay: 0s;
+    }
+    .icon-ring:nth-child(2) {
+      inset: 0px;
+      border-color: rgba(61,220,132,0.08);
+      animation-delay: 0.5s;
+    }
+    .icon-ring:nth-child(3) {
+      inset: -12px;
+      border-color: rgba(61,220,132,0.04);
+      animation-delay: 1s;
+    }
+
+    @keyframes ring-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.04); opacity: 0.4; }
+    }
+
+    .shield-svg {
+      position: relative;
+      z-index: 2;
+      animation: shield-float 5s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(61,220,132,0.45))
+              drop-shadow(0 0 60px rgba(61,220,132,0.2));
+    }
+
+    @keyframes shield-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    /* ─── Message ────────────────────────────────── */
+    .message-group {
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fade-up 0.6s ease 0.35s forwards;
+    }
+
+    .message-group h1 {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      background: linear-gradient(160deg, #ffffff 30%, #888899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .site-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(240,84,84,0.1);
+      border: 1px solid rgba(240,84,84,0.2);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #f09090;
+      letter-spacing: 0.02em;
+    }
+
+    .site-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--danger);
+      flex-shrink: 0;
+    }
+
+    /* ─── Divider ────────────────────────────────── */
+    .divider {
+      width: 48px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      margin: 28px auto;
+      opacity: 0;
+      animation: fade-up 0.5s ease 0.5s forwards;
+    }
+
+    /* ─── Quote ──────────────────────────────────── */
+    .quote-section {
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fade-up 0.6s ease 0.55s forwards;
+      max-width: 480px;
+    }
+
+    .quote-text {
+      font-size: 16px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--text-2);
+      line-height: 1.65;
+      letter-spacing: 0.005em;
+    }
+
+    /* ─── Focus Timer ─────────────────────────────── */
+    .focus-timer {
+      opacity: 0;
+      animation: fade-up 0.6s ease 0.7s forwards;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 20px 32px 16px;
+      margin-bottom: 44px;
+      backdrop-filter: blur(8px);
+    }
+
+    .timer-top-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .timer-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .timer-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      font-weight: 600;
+    }
+
+    .timer-sep {
+      font-size: 24px;
+      font-weight: 300;
+      color: var(--text-3);
+      line-height: 1;
+      margin-top: -4px;
+    }
+
+    .timer-divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(255,255,255,0.08);
+      margin: 0 8px;
+    }
+
+    .session-label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+    }
+
+    .session-label-top {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      font-weight: 600;
+    }
+
+    .session-label-bottom {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .session-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px rgba(61,220,132,0.7);
+      animation: pulse-session 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse-session {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ─── Breathing Widget ───────────────────────── */
+    .breathe-widget {
+      opacity: 0;
+      animation: fade-up 0.6s ease 0.85s forwards;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .breathe-ring-wrap {
+      position: relative;
+      width: 100px;
+      height: 100px;
+    }
+
+    .breathe-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .breathe-track {
+      fill: none;
+      stroke: rgba(255,255,255,0.06);
+      stroke-width: 3;
+    }
+
+    .breathe-progress {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-dasharray: 251.2;
+      stroke-dashoffset: 251.2;
+      transition: stroke-dashoffset 0.1s linear;
+      filter: drop-shadow(0 0 4px rgba(61,220,132,0.5));
+    }
+
+    .breathe-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .breathe-phase {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      transition: opacity 0.4s ease;
+    }
+
+    .breathe-count {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .breathe-hint {
+      font-size: 12px;
+      color: var(--text-3);
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+
+    .last-session-row {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      width: 100%;
+      justify-content: center;
+    }
+
+    .last-session-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-3);
+      font-weight: 600;
+    }
+
+    .last-session-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-2);
+      letter-spacing: -0.01em;
+    }
+
+    /* ─── Animations ─────────────────────────────── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scale-in {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* ─── Responsive ─────────────────────────────── */
+    @media (max-width: 600px) {
+      .message-group h1 { font-size: 28px; }
+      .quote-text { font-size: 15px; }
+      .watermark { top: 20px; left: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Background -->
+  <div class="bg-ambient" aria-hidden="true">
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+  </div>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Animated Shield Icon -->
+    <div class="icon-container">
+      <div class="icon-rings">
+        <div class="icon-ring"></div>
+        <div class="icon-ring"></div>
+        <div class="icon-ring"></div>
+      </div>
+      <img class="shield-svg" src="icons/icon128.png" width="64" height="64" alt="FocusShield">
+    </div>
+
+    <!-- Heading & Site Badge -->
+    <div class="message-group">
+      <h1>You're in Focus Mode</h1>
+      <div class="site-badge">
+        <div class="site-badge-dot"></div>
+        <span id="site-message">This site is blocked</span>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Motivational Quote -->
+    <div class="quote-section">
+      <p class="quote-text" id="quote-text">"Your focus is your greatest currency. Spend it wisely."</p>
+    </div>
+
+    <!-- Focus Session Timer -->
+    <div class="focus-timer" id="focus-timer">
+      <!-- Top row: clock + session status -->
+      <div class="timer-top-row">
+        <div class="timer-block">
+          <span class="timer-value" id="timer-h">00</span>
+          <span class="timer-label">hrs</span>
+        </div>
+        <span class="timer-sep">:</span>
+        <div class="timer-block">
+          <span class="timer-value" id="timer-m">00</span>
+          <span class="timer-label">min</span>
+        </div>
+        <span class="timer-sep">:</span>
+        <div class="timer-block">
+          <span class="timer-value" id="timer-s">00</span>
+          <span class="timer-label">sec</span>
+        </div>
+        <div class="timer-divider"></div>
+        <div class="session-label">
+          <span class="session-label-top">Session</span>
+          <span class="session-label-bottom">
+            <span class="session-dot"></span>
+            Active
+          </span>
+        </div>
+      </div>
+      <!-- Bottom row: last focus was -->
+      <div class="last-session-row" id="last-session-row">
+        <span class="last-session-label">Last focus was</span>
+        <span class="last-session-value" id="last-session-value">—</span>
+      </div>
+    </div>
+
+    <!-- Breathing Widget -->
+    <div class="breathe-widget">
+      <div class="breathe-ring-wrap">
+        <svg class="breathe-svg" viewBox="0 0 86 86">
+          <circle class="breathe-track" cx="43" cy="43" r="40"/>
+          <circle class="breathe-progress" id="breathe-progress" cx="43" cy="43" r="40"/>
+        </svg>
+        <div class="breathe-inner">
+          <span class="breathe-phase" id="breathe-phase">Inhale</span>
+          <span class="breathe-count" id="breathe-count">4</span>
+        </div>
+      </div>
+      <span class="breathe-hint">Breathe with the ring</span>
+    </div>
+
+  </main>
+
+  <script src="blocked.js"></script>
+</body>
+</html>
