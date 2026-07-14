@@ -237,7 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       localStorage.removeItem('focusshield_mock_session');
       this.broadcastSession(null);
-      window.location.href = 'index.html';
+      
+      const path = window.location.pathname;
+      if (path.endsWith('account.html')) {
+        window.location.href = 'index.html';
+      } else {
+        window.location.reload();
+      }
     },
 
     async updateName(fullName) {
