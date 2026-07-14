@@ -189,7 +189,7 @@
             <li><span class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>1 smart filter category</li>
             <li><span class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Today's focus analytics only</li>
           </ul>
-          <a href="signup.html" class="pc-cta cta-ghost">Get Started Free</a>
+          <a href="signup.html" id="free-plan-btn" class="pc-cta cta-ghost">Get Started Free</a>
         </div>
         <!-- Pro -->
         <div class="pc pop au d2" id="pro-card-container">
@@ -438,7 +438,38 @@
       const planPriceEl   = document.getElementById('checkout-plan-price');
       const emailInput    = document.getElementById('checkout-email');
       const session = JSON.parse(localStorage.getItem('focusshield_mock_session') || 'null');
-      if (session) emailInput.value = session.email;
+      if (session) {
+        emailInput.value = session.email;
+        const freeBtn = document.getElementById('free-plan-btn');
+        const proBtn = document.getElementById('pro-card-cta');
+        
+        if (freeBtn) {
+          if (!session.isPremium) {
+            freeBtn.textContent = 'Activated';
+            freeBtn.href = '#';
+            freeBtn.style.pointerEvents = 'none';
+            freeBtn.style.background = 'rgba(61, 220, 132, 0.1)';
+            freeBtn.style.borderColor = 'rgba(61, 220, 132, 0.2)';
+            freeBtn.style.color = 'var(--accent)';
+            freeBtn.style.opacity = '1';
+          } else {
+            freeBtn.textContent = 'Free Plan';
+            freeBtn.href = '#';
+            freeBtn.style.pointerEvents = 'none';
+            freeBtn.style.opacity = '0.5';
+          }
+        }
+        
+        if (proBtn && session.isPremium) {
+          proBtn.textContent = 'Activated';
+          proBtn.disabled = true;
+          proBtn.style.pointerEvents = 'none';
+          proBtn.style.background = 'rgba(61, 220, 132, 0.1)';
+          proBtn.style.border = '1px solid rgba(61, 220, 132, 0.2)';
+          proBtn.style.color = 'var(--accent)';
+          proBtn.style.boxShadow = 'none';
+        }
+      }
       document.querySelectorAll('.checkout-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           planNameEl.textContent  = btn.getAttribute('data-plan');
