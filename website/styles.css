@@ -902,12 +902,31 @@ footer {
   margin: 8px 0;
 }
 
+.mobile-menu a[href="login.html"] {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 6px;
+}
+
+.mobile-menu a[href="login.html"]:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
 .mobile-menu .mobile-signup {
   background: linear-gradient(90deg, var(--accent), #56e29f);
   color: #000;
   font-weight: 700;
   text-align: center;
   margin-top: 4px;
+}
+
+.mobile-menu .mobile-signup:hover {
+  background: linear-gradient(90deg, #56e29f, var(--accent));
+  color: #000;
 }
 
 /* ════════════════════════════════════════════
