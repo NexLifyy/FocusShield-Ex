@@ -453,10 +453,13 @@
             freeBtn.style.color = 'var(--accent)';
             freeBtn.style.opacity = '1';
           } else {
-            freeBtn.textContent = 'Free Plan';
-            freeBtn.href = '#';
-            freeBtn.style.pointerEvents = 'none';
-            freeBtn.style.opacity = '0.5';
+            freeBtn.textContent = 'Move back to Free';
+            freeBtn.href = 'account.html';
+            freeBtn.style.pointerEvents = 'auto';
+            freeBtn.style.opacity = '1';
+            freeBtn.style.background = 'rgba(255, 255, 255, 0.04)';
+            freeBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+            freeBtn.style.color = 'var(--text-secondary)';
           }
         }
         
