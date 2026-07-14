@@ -148,9 +148,10 @@
           if (!user) {
             window.location.href = 'login.html';
           } else {
-            window.location.reload(); // Refresh to render the new session
+            window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
+            window.location.reload();
           }
-        }, 1500);
+        }, 3500);
         return;
       }
 

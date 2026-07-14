@@ -71,14 +71,22 @@ document.addEventListener('DOMContentLoaded', () => {
           // Redirect logic: check if there's a saved auth_redirect target
           const redirectTarget = sessionStorage.getItem('auth_redirect');
           const path = window.location.pathname;
+          const isOAuthCallback = window.location.hash || window.location.href.includes('error=');
           
           if (redirectTarget) {
             console.log('[FocusShield] OAuth resolved. Redirecting to target:', redirectTarget);
             sessionStorage.removeItem('auth_redirect');
             window.location.href = redirectTarget;
           } else if (path.endsWith('login.html') || path.endsWith('signup.html')) {
-            console.log('[FocusShield] OAuth resolved. Redirecting user to account page...');
+            console.log('[FocusShield] OAuth resolved on auth page. Redirecting user to account page...');
             window.location.href = 'account.html';
+          } else if ((path.endsWith('index.html') || path === '/' || path === '' || path.endsWith('/')) && isOAuthCallback) {
+            console.log('[FocusShield] OAuth callback landed on homepage. Redirecting to account...');
+            window.location.href = 'account.html';
+          } else if (path.endsWith('account.html') && isOAuthCallback) {
+            console.log('[FocusShield] OAuth callback resolved on account page. Reloading cleanly...');
+            window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
+            window.location.reload();
           }
         } else if (event === 'SIGNED_OUT') {
           localStorage.removeItem('focusshield_mock_session');
