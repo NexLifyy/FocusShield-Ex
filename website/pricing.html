@@ -201,7 +201,7 @@
             <button type="button" class="sw-btn" data-type="lifetime" onclick="selectProPlan('lifetime')">Lifetime</button>
           </div>
           <div class="pc-price" id="pro-price-num"><sup>$</sup>1.99<span class="per">/mo</span></div>
-          <div class="pc-sub" id="pro-billing-sub">Billed yearly ($23.88/yr) &mdash; cancel anytime</div>
+          <div class="pc-sub" id="pro-billing-sub">7-day free trial, then $23.88/yr. Cancel anytime.</div>
           <div class="card-divider"></div>
           <ul class="card-features">
             <li><span class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Unlimited blocked websites</li>
@@ -212,8 +212,11 @@
             <li><span class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Cloud sync &amp; backup</li>
             <li><span class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Priority email support</li>
           </ul>
-          <button class="pc-cta cta-green checkout-btn" id="pro-card-cta" data-plan="Pro Yearly Plan" data-price="$24.99/yr">Start 7-Day Free Trial</button>
+          <button class="pc-cta cta-green checkout-btn" id="pro-card-cta" data-plan="Pro Yearly Plan" data-price="$23.88/yr">Start 7-Day Free Trial</button>
         </div>
+      </div>
+      <div style="text-align: center; margin-top: 24px; font-size: 12px; color: var(--text-muted);" class="au d3">
+        * Taxes may apply and will be calculated at checkout.
       </div>
     </div>
   </div>
@@ -347,7 +350,8 @@
       <div style="text-align:center;margin-bottom:24px;">
         <span style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);font-weight:700;">Paddle Secure Checkout</span>
         <h2 style="font-family:var(--font-headings);font-size:24px;font-weight:800;margin-top:6px;" id="checkout-plan-name">Pro Plan</h2>
-        <p style="font-size:13px;color:var(--text-secondary);" id="checkout-plan-price">$24.99/yr</p>
+        <p style="font-size:14px;color:#fff;font-weight:700;margin-bottom:4px;" id="checkout-plan-price">$23.88/yr</p>
+        <p style="font-size:11px;color:var(--text-muted);">Taxes may apply and will be calculated at checkout.</p>
       </div>
       <form id="checkout-form" style="display:flex;flex-direction:column;gap:16px;">
         <div class="form-group"><label>Email Address</label><input type="email" id="checkout-email" class="form-input" required placeholder="name@example.com"></div>
@@ -411,12 +415,12 @@
   </footer>
 
   <script src="supabase.js?v=2"></script>
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
   <script>
     const proPricing = {
-      monthly:  { html: '<sup>$</sup>2.99<span class="per">/mo</span>',  billing: 'Billed monthly &mdash; cancel anytime',              cta: 'Get Pro Monthly',        planName: 'Pro Monthly Plan',  priceVal: '$2.99/mo',  popular: false },
-      yearly:   { html: '<!-- price-num --><sup>$</sup>1.99<span class="per">/mo</span>', billing: 'Billed yearly ($23.88/yr) &mdash; cancel anytime', cta: 'Start 7-Day Free Trial', planName: 'Pro Yearly Plan',   priceVal: '$23.88/yr', popular: true  },
-      lifetime: { html: '<sup>$</sup>49.99<span class="per"></span>',    billing: 'One-time payment &mdash; lifetime updates',            cta: 'Buy Lifetime Pro',       planName: 'Pro Lifetime Plan', priceVal: '$49.99',    popular: false }
+      monthly:  { html: '<sup>$</sup>2.99<span class="per">/mo</span>',  billing: 'Billed monthly. Cancel anytime.',              cta: 'Get Pro Monthly',        planName: 'Pro Monthly Plan',  priceVal: '$2.99/mo',  popular: false },
+      yearly:   { html: '<!-- price-num --><sup>$</sup>1.99<span class="per">/mo</span>', billing: '7-day free trial, then $23.88/yr. Cancel anytime.', cta: 'Start 7-Day Free Trial', planName: 'Pro Yearly Plan',   priceVal: '$23.88/yr', popular: true  },
+      lifetime: { html: '<sup>$</sup>49.99<span class="per"></span>',    billing: 'One-time payment. Lifetime updates.',            cta: 'Buy Lifetime Pro',       planName: 'Pro Lifetime Plan', priceVal: '$49.99',    popular: false }
     };
     function selectProPlan(type) {
       document.querySelectorAll('.sw-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-type') === type));
