@@ -519,6 +519,21 @@
           });
         });
       });
+
+      // Auto-open checkout if ?plan=monthly/yearly/lifetime query parameter is set
+      const urlParams = new URLSearchParams(window.location.search);
+      const planParam = urlParams.get('plan');
+      if (planParam && priceMap[planParam]) {
+        selectProPlan(planParam);
+        setTimeout(() => {
+          Paddle.Checkout.open({
+            items: [{ priceId: priceMap[planParam], quantity: 1 }],
+            customer: {
+              email: session ? session.email : ''
+            }
+          });
+        }, 500); // Small timeout to ensure Paddle is fully loaded
+      }
     });
   </script>
   <script>

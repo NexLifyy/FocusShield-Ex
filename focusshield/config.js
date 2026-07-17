@@ -1,7 +1,7 @@
 const FOCUSSHIELD_CONFIG = {
   // ── PADDLE BILLING CHECKOUT URLS ──
   // Replace these with your live Cloudflare Pages URL once you buy your domain!
-  checkoutUrl: 'https://company.com/focusshield/checkout', 
+  checkoutUrl: 'https://getfocusshield.site/pricing.html', 
 
   // ── SUPABASE CONFIGURATION ──
   // Toggle this to true to enable live connection to your Supabase project!
