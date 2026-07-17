@@ -2912,15 +2912,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Close Paywall Button
+  // Close Paywall Button / Redirect to Login
   const btnPaywallClose = document.getElementById('btn-paywall-close');
   if (btnPaywallClose) {
     btnPaywallClose.addEventListener('click', () => {
       const overlay = document.getElementById('paywall-overlay');
       if (overlay) overlay.style.display = 'none';
+      chrome.tabs.create({ url: 'https://getfocusshield.site/login' });
     });
   }
 
+  // Back Button at top of Paywall
   const btnPaywallCloseTop = document.getElementById('btn-paywall-close-top');
   if (btnPaywallCloseTop) {
     btnPaywallCloseTop.addEventListener('click', () => {
