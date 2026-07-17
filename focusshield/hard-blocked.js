@@ -414,6 +414,27 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }, 1000);
 
+  } else if (isFilterType) {
+    // Category Filter check interval — check if the category filter gets disabled in settings
+    let filterCheckInterval = setInterval(() => {
+      chrome.storage.local.get(null, (settings) => {
+        const masterToggle = settings && settings.masterToggle !== false;
+        
+        let filterKey = 'filterAdult';
+        const b = blockedSite.toLowerCase();
+        if (b.includes('gaming')) filterKey = 'filterGaming';
+        else if (b.includes('shopping')) filterKey = 'filterShopping';
+        else if (b.includes('gambling')) filterKey = 'filterGambling';
+        else if (b.includes('streaming')) filterKey = 'filterStreaming';
+        
+        const filterEnabled = settings && settings[filterKey];
+        if (!masterToggle || !filterEnabled) {
+          clearInterval(filterCheckInterval);
+          window.location.href = originalUrl;
+        }
+      });
+    }, 1000);
+
   } else {
     // Standard Countdown — query chrome.storage.local to resolve exact hard block entry
     chrome.storage.local.get('hardBlockedSites', (res) => {

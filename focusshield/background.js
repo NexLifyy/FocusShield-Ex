@@ -365,7 +365,7 @@ function checkBlockedUrl(urlStr, settings) {
       if (isEnabled) {
         if (platform === 'youtube' && settings.youtube && settings.youtube.shorts) {
           if (path.startsWith('/shorts')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=youtube.com/shorts'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
@@ -373,32 +373,32 @@ function checkBlockedUrl(urlStr, settings) {
         if (platform === 'facebook' && settings.facebook) {
           const fb = settings.facebook;
           if (fb.reels && (path.startsWith('/reels') || path.startsWith('/reel'))) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=facebook.com/reels'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (fb.messenger && path.startsWith('/messages')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=facebook.com/messages'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (fb.messenger && url.hostname.includes('messenger.com')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=messenger.com'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (fb.friends && (path.startsWith('/friends') || path.startsWith('/friends/'))) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=facebook.com/friends'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (fb.groups && (path.startsWith('/groups') || path.startsWith('/groups/'))) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=facebook.com/groups'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (fb.pages && (path.startsWith('/pages') || path.startsWith('/pages/'))) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=facebook.com/pages'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
@@ -406,7 +406,7 @@ function checkBlockedUrl(urlStr, settings) {
         if (platform === 'twitter' && settings.twitter) {
           const tw = settings.twitter;
           if (tw.messages && (path.startsWith('/messages') || path.startsWith('/chat'))) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=x.com/messages'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
@@ -416,7 +416,7 @@ function checkBlockedUrl(urlStr, settings) {
                                     path.includes('/trends') || 
                                     path.startsWith('/i/trends');
           if ((tw.explore || tw.feed) && isExploreOrSearch) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=x.com/explore'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
@@ -424,27 +424,27 @@ function checkBlockedUrl(urlStr, settings) {
         if (platform === 'instagram' && settings.instagram) {
           const ig = settings.instagram;
           if (ig.reels && (path.startsWith('/reels') || path.startsWith('/reel'))) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=instagram.com/reels'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (ig.explore && path.startsWith('/explore')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=instagram.com/explore'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (ig.shopping && (path.startsWith('/shop') || path.startsWith('/shopping'))) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=instagram.com/shop'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (ig.messages && path.startsWith('/direct')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=instagram.com/direct'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (ig.stories && path.startsWith('/stories')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=instagram.com/stories'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
@@ -461,7 +461,7 @@ function checkBlockedUrl(urlStr, settings) {
             if (isAll) label = 'reddit.com/r/all';
             else if (isNews) label = 'reddit.com/news';
             else if (isExplore) label = 'reddit.com/explore';
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=' + encodeURIComponent(label)
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
@@ -469,32 +469,32 @@ function checkBlockedUrl(urlStr, settings) {
         if (platform === 'tiktok' && settings.tiktok) {
           const tt = settings.tiktok;
           if (tt.foryou && (path === '/' || path === '/foryou' || path === '/recommend' || path === '/explore')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=tiktok.com/foryou'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (tt.following && path.startsWith('/following')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=tiktok.com/following'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (tt.live && path.startsWith('/live')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=tiktok.com/live'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (tt.shop && path.startsWith('/shop')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=tiktok.com/shop'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (tt.search && path.startsWith('/search')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=tiktok.com/search'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
           if (tt.upload && path.startsWith('/upload')) {
-            return chrome.runtime.getURL('hard-blocked.html') 
+            return chrome.runtime.getURL('blocked.html') 
               + '?site=tiktok.com/upload'
               + '&originalUrl=' + encodeURIComponent(urlStr);
           }
