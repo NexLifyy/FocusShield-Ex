@@ -1865,8 +1865,9 @@
         // Direct page load check for Shorts on YouTube
         if (platform === 'youtube' && settings.youtube && settings.youtube.shorts) {
           if (window.location.pathname.startsWith('/shorts')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=youtube.com/shorts'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
@@ -1878,48 +1879,54 @@
         if (platform === 'facebook' && settings.facebook) {
           const fb = settings.facebook;
           if (fb.reels && (window.location.pathname.startsWith('/reels') || window.location.pathname.startsWith('/reel'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/reels'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (fb.messenger && window.location.pathname.startsWith('/messages')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/messages'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (fb.messenger && hostname.includes('messenger.com')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=messenger.com'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (fb.friends && (window.location.pathname.startsWith('/friends') || window.location.pathname.startsWith('/friends/'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/friends'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (fb.groups && (window.location.pathname.startsWith('/groups') || window.location.pathname.startsWith('/groups/'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/groups'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (fb.pages && (window.location.pathname.startsWith('/pages') || window.location.pathname.startsWith('/pages/'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=facebook.com/pages'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
@@ -1931,8 +1938,9 @@
         if (platform === 'twitter' && settings.twitter) {
           const tw = settings.twitter;
           if (tw.messages && (window.location.pathname.startsWith('/messages') || window.location.pathname.startsWith('/chat'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=x.com/messages'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
@@ -1944,8 +1952,9 @@
                                     window.location.pathname.includes('/trends') || 
                                     window.location.pathname.startsWith('/i/trends');
           if ((tw.explore || tw.feed) && isExploreOrSearch) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=x.com/explore'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
@@ -1962,40 +1971,45 @@
             document.documentElement.setAttribute('data-fs-ig-home', 'true');
           }
           if (ig.reels && (path.startsWith('/reels') || path.startsWith('/reel'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/reels'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (ig.explore && path.startsWith('/explore')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/explore'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (ig.shopping && (path.startsWith('/shop') || path.startsWith('/shopping'))) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/shop'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (ig.messages && path.startsWith('/direct')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/direct'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (ig.stories && path.startsWith('/stories')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=instagram.com/stories'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
@@ -2034,8 +2048,9 @@
             if (isAll) label = 'reddit.com/r/all';
             else if (isNews) label = 'reddit.com/news';
             else if (isExplore) label = 'reddit.com/explore';
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=' + encodeURIComponent(label)
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
@@ -2053,48 +2068,54 @@
           const path = window.location.pathname.toLowerCase();
           
           if (tt.foryou && (path === '/' || path === '/foryou' || path === '/recommend' || path === '/explore')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/foryou'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (tt.following && path.startsWith('/following')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/following'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (tt.live && path.startsWith('/live')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/live'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (tt.shop && path.startsWith('/shop')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/shop'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (tt.search && path.startsWith('/search')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/search'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;
             return;
           }
           if (tt.upload && path.startsWith('/upload')) {
-            const blockedUrl = chrome.runtime.getURL('blocked.html') 
+            const blockedUrl = chrome.runtime.getURL('hard-blocked.html') 
               + '?site=tiktok.com/upload'
+              + '&type=subfeature'
               + '&returnUrl=' + encodeURIComponent(document.referrer || '')
               + '&originalUrl=' + encodeURIComponent(window.location.href);
             window.location.href = blockedUrl;

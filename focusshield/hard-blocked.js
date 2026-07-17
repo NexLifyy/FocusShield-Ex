@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const originalUrl = params.get('originalUrl') || ('https://' + blockedSite);
 
   const isFilterType = params.get('type') === 'filter';
+  const isSubFeatureType = params.get('type') === 'subfeature';
   const targetDomain = params.get('domain') || '';
 
   const TEMP_UNLOCK_DURATION_MS = 10 * 60 * 1000; // 10 minutes
@@ -265,6 +266,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const dividerText = document.getElementById('divider-text');
     if (dividerText) dividerText.textContent = 'unlock site';
+  } else if (isSubFeatureType) {
+    // Hide countdown, divider, unlock button
+    const cdCard = document.getElementById('countdown-card');
+    if (cdCard) cdCard.style.display = 'none';
+
+    const divider = document.querySelector('.section-divider');
+    if (divider) divider.style.display = 'none';
+
+    const unlockBtn = document.getElementById('unlock-early-btn');
+    if (unlockBtn) unlockBtn.style.display = 'none';
+
+    const schedCard = document.getElementById('schedule-details-card');
+    if (schedCard) {
+      schedCard.style.display = 'block';
+      const label = schedCard.querySelector('.countdown-label');
+      if (label) label.textContent = 'Feature is Blocked';
+      const heading = document.getElementById('schedule-time-range');
+      if (heading) {
+        heading.textContent = blockedSite;
+        heading.style.color = 'var(--accent)';
+      }
+      const days = document.getElementById('schedule-days-list');
+      if (days) days.textContent = 'This feature is blocked by your FocusShield settings.';
+    }
   } else if (isScheduleType) {
     // Hide countdown, divider, unlock button
     const cdCard = document.getElementById('countdown-card');
@@ -430,6 +455,65 @@ document.addEventListener('DOMContentLoaded', () => {
         const filterEnabled = settings && settings[filterKey];
         if (!masterToggle || !filterEnabled) {
           clearInterval(filterCheckInterval);
+          window.location.href = originalUrl;
+        }
+      });
+    }, 1000);
+  } else if (isSubFeatureType) {
+    // Sub-Feature check interval — check if the user disables this block in settings
+    let subFeatureInterval = setInterval(() => {
+      chrome.storage.local.get(null, (settings) => {
+        const masterToggle = settings && settings.masterToggle !== false;
+        
+        let enabled = false;
+        if (settings) {
+          if (blockedSite.includes('youtube.com/shorts') && settings.youtube) {
+            enabled = settings.youtube.enabled !== false && settings.youtube.shorts;
+          } else if (blockedSite.includes('facebook.com/reels') && settings.facebook) {
+            enabled = settings.facebook.enabled !== false && settings.facebook.reels;
+          } else if (blockedSite.includes('facebook.com/messages') && settings.facebook) {
+            enabled = settings.facebook.enabled !== false && settings.facebook.messenger;
+          } else if (blockedSite.includes('messenger.com') && settings.facebook) {
+            enabled = settings.facebook.enabled !== false && settings.facebook.messenger;
+          } else if (blockedSite.includes('facebook.com/friends') && settings.facebook) {
+            enabled = settings.facebook.enabled !== false && settings.facebook.friends;
+          } else if (blockedSite.includes('facebook.com/groups') && settings.facebook) {
+            enabled = settings.facebook.enabled !== false && settings.facebook.groups;
+          } else if (blockedSite.includes('facebook.com/pages') && settings.facebook) {
+            enabled = settings.facebook.enabled !== false && settings.facebook.pages;
+          } else if (blockedSite.includes('x.com/messages') && settings.twitter) {
+            enabled = settings.twitter.enabled !== false && settings.twitter.messages;
+          } else if (blockedSite.includes('x.com/explore') && settings.twitter) {
+            enabled = settings.twitter.enabled !== false && (settings.twitter.explore || settings.twitter.feed);
+          } else if (blockedSite.includes('instagram.com/reels') && settings.instagram) {
+            enabled = settings.instagram.enabled !== false && settings.instagram.reels;
+          } else if (blockedSite.includes('instagram.com/explore') && settings.instagram) {
+            enabled = settings.instagram.enabled !== false && settings.instagram.explore;
+          } else if (blockedSite.includes('instagram.com/shop') && settings.instagram) {
+            enabled = settings.instagram.enabled !== false && settings.instagram.shopping;
+          } else if (blockedSite.includes('instagram.com/direct') && settings.instagram) {
+            enabled = settings.instagram.enabled !== false && settings.instagram.messages;
+          } else if (blockedSite.includes('instagram.com/stories') && settings.instagram) {
+            enabled = settings.instagram.enabled !== false && settings.instagram.stories;
+          } else if (blockedSite.includes('reddit.com/r/popular') && settings.reddit) {
+            enabled = settings.reddit.enabled !== false && settings.reddit.popularAll;
+          } else if (blockedSite.includes('tiktok.com/foryou') && settings.tiktok) {
+            enabled = settings.tiktok.enabled !== false && settings.tiktok.foryou;
+          } else if (blockedSite.includes('tiktok.com/following') && settings.tiktok) {
+            enabled = settings.tiktok.enabled !== false && settings.tiktok.following;
+          } else if (blockedSite.includes('tiktok.com/live') && settings.tiktok) {
+            enabled = settings.tiktok.enabled !== false && settings.tiktok.live;
+          } else if (blockedSite.includes('tiktok.com/shop') && settings.tiktok) {
+            enabled = settings.tiktok.enabled !== false && settings.tiktok.shop;
+          } else if (blockedSite.includes('tiktok.com/search') && settings.tiktok) {
+            enabled = settings.tiktok.enabled !== false && settings.tiktok.search;
+          } else if (blockedSite.includes('tiktok.com/upload') && settings.tiktok) {
+            enabled = settings.tiktok.enabled !== false && settings.tiktok.upload;
+          }
+        }
+        
+        if (!masterToggle || !enabled) {
+          clearInterval(subFeatureInterval);
           window.location.href = originalUrl;
         }
       });
