@@ -212,7 +212,7 @@
             <li><span class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Cloud sync &amp; backup</li>
             <li><span class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Priority email support</li>
           </ul>
-          <button class="pc-cta cta-green checkout-btn" id="pro-card-cta" data-plan="Pro Yearly Plan" data-price="$23.88/yr">Start 7-Day Free Trial</button>
+          <button class="pc-cta cta-green checkout-btn" id="pro-card-cta" data-plan="Pro Yearly Plan" data-price="$23.88/yr" data-plan-type="yearly">Start 7-Day Free Trial</button>
         </div>
       </div>
       <div style="text-align: center; margin-top: 24px; font-size: 12px; color: var(--text-muted);" class="au d3">
@@ -414,6 +414,7 @@
     </div>
   </footer>
 
+  <script src="https://cdn.paddle.com/paddlejs/v3/paddle.js"></script>
   <script src="supabase.js?v=2"></script>
   <script src="app.js?v=5"></script>
   <script>
@@ -431,6 +432,7 @@
       btn.textContent = d.cta;
       btn.setAttribute('data-plan', d.planName);
       btn.setAttribute('data-price', d.priceVal);
+      btn.setAttribute('data-plan-type', type);
       document.getElementById('pro-card-container').classList.toggle('pop', d.popular);
     }
 
@@ -477,24 +479,45 @@
           proBtn.style.boxShadow = 'none';
         }
       }
+      // Initialize Paddle Sandbox
+      Paddle.Initialize({ 
+        token: 'test_5a6451b88aa7a5e5856b7f521b3', 
+        environment: 'sandbox',
+        eventCallback: function(data) {
+          if (data.name === 'checkout.completed') {
+            const email = data.data.customer.email || (session ? session.email : '');
+            if (window.authEngine) {
+              window.authEngine.upgradeToPremium(email).then(() => {
+                successModal.style.display = 'flex';
+              });
+            }
+          }
+        }
+      });
+
+      const priceMap = {
+        monthly: 'pri_01kxrkpy9smm7aknsyzwfs6fws',
+        yearly: 'pri_01kxrkr5p6f3mz1eghb3qn18hv',
+        lifetime: 'pri_01kxrks7p2r4g8wee3kmkvx9f3'
+      };
+
       document.querySelectorAll('.checkout-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          planNameEl.textContent  = btn.getAttribute('data-plan');
-          planPriceEl.textContent = btn.getAttribute('data-price');
-          checkoutModal.style.display = 'flex';
+          const planType = btn.getAttribute('data-plan-type') || 'yearly';
+          const priceId = priceMap[planType];
+          
+          if (!priceId) {
+            console.error('Invalid price ID for plan type:', planType);
+            return;
+          }
+
+          Paddle.Checkout.open({
+            items: [{ priceId: priceId, quantity: 1 }],
+            customer: {
+              email: session ? session.email : ''
+            }
+          });
         });
-      });
-      closeBtn.addEventListener('click', () => { checkoutModal.style.display = 'none'; });
-      document.getElementById('checkout-form').addEventListener('submit', async e => {
-        e.preventDefault();
-        const emailVal = emailInput.value.trim();
-        
-        if (window.authEngine) {
-          await window.authEngine.upgradeToPremium(emailVal);
-        }
-        
-        checkoutModal.style.display = 'none';
-        successModal.style.display  = 'flex';
       });
     });
   </script>
