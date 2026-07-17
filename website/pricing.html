@@ -487,21 +487,24 @@
           proBtn.style.boxShadow = 'none';
         }
       }
-      // Initialize Paddle Billing (Sandbox)
-      Paddle.Environment.set('sandbox');
-      Paddle.Setup({ 
-        vendor: 0, // Not used for Billing but required by Setup
-        eventCallback: function(data) {
-          if (data.event === 'Checkout.Complete') {
-            const email = (data.checkoutData && data.checkoutData.user && data.checkoutData.user.email) || (session ? session.email : '');
-            if (window.authEngine && email) {
-              window.authEngine.upgradeToPremium(email).then(() => {
-                if (successModal) successModal.style.display = 'flex';
-              });
+      // Initialize Paddle Billing API (sandbox mode via test_ token)
+      try {
+        Paddle.Initialize({
+          token: 'test_5a6451b88aa7a5e5856b7f521b3',
+          eventCallback: function(data) {
+            if (data.name === 'checkout.completed') {
+              const email = (data.data && data.data.customer && data.data.customer.email) || (session ? session.email : '');
+              if (window.authEngine && email) {
+                window.authEngine.upgradeToPremium(email).then(() => {
+                  if (successModal) successModal.style.display = 'flex';
+                });
+              }
             }
           }
-        }
-      });
+        });
+      } catch(e) {
+        console.error('[Paddle] Initialize failed:', e);
+      }
 
       const priceMap = {
         monthly: 'pri_01kxrkpy9smm7aknsyzwfs6fws',
@@ -513,15 +516,15 @@
         const priceId = priceMap[planType || 'yearly'];
         if (!priceId) return;
         const email = session ? session.email : '';
-        Paddle.Checkout.open({
-          settings: {
-            displayMode: 'overlay',
-            theme: 'dark',
-            locale: 'en'
-          },
-          items: [{ priceId: priceId, quantity: 1 }],
-          customer: email ? { email: email } : undefined
-        });
+        try {
+          Paddle.Checkout.open({
+            items: [{ priceId: priceId, quantity: 1 }],
+            customer: email ? { email: email } : undefined
+          });
+        } catch(e) {
+          console.error('[Paddle] Checkout.open failed:', e);
+          alert('Checkout could not open. Please try again or contact support.');
+        }
       }
 
       document.querySelectorAll('.checkout-btn').forEach(btn => {
@@ -536,7 +539,7 @@
       const planParam = urlParams.get('plan');
       if (planParam && priceMap[planParam]) {
         selectProPlan(planParam);
-        setTimeout(() => openPaddleCheckout(planParam), 800);
+        setTimeout(() => openPaddleCheckout(planParam), 1000);
       }
     });
   </script>
