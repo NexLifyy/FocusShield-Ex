@@ -513,10 +513,29 @@
         lifetime: 'pri_01kxrks7p2r4g8wee3kmkvx9f3'
       };
 
-      function openPaddleCheckout(planType) {
+      // Get live Supabase session (not just localStorage mock session)
+      async function getLiveSession() {
+        if (window.supabaseClient) {
+          const { data } = await window.supabaseClient.auth.getSession();
+          return data && data.session ? data.session : null;
+        }
+        return null;
+      }
+
+      async function openPaddleCheckout(planType) {
         const priceId = priceMap[planType || 'yearly'];
         if (!priceId) return;
-        const email = session ? session.email : '';
+
+        // ── Login gate: must be signed in before checkout ──
+        const liveSession = await getLiveSession();
+        if (!liveSession) {
+          // Save intent so after login we return here and auto-open checkout
+          sessionStorage.setItem('auth_redirect', 'pricing.html?plan=' + (planType || 'yearly'));
+          window.location.href = 'login.html?redirect=account';
+          return;
+        }
+
+        const email = liveSession.user.email || '';
         try {
           Paddle.Checkout.open({
             items: [{ priceId: priceId, quantity: 1 }],
@@ -536,11 +555,13 @@
       });
 
       // Auto-open checkout if ?plan=monthly/yearly/lifetime query parameter is set
+      // (triggered after login redirect returns user to pricing page)
       const urlParams = new URLSearchParams(window.location.search);
       const planParam = urlParams.get('plan');
       if (planParam && priceMap[planParam]) {
         selectProPlan(planParam);
-        setTimeout(() => openPaddleCheckout(planParam), 1000);
+        // Delay to let Supabase session restore after OAuth redirect
+        setTimeout(() => openPaddleCheckout(planParam), 1500);
       }
     });
   </script>

@@ -3,7 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Parse redirect query parameter if present and store in sessionStorage
   const urlParams = new URLSearchParams(window.location.search);
   const redirectParam = urlParams.get('redirect');
-  if (redirectParam === 'account') {
+  // Only overwrite auth_redirect if not already set to a pricing intent
+  const existingRedirect = sessionStorage.getItem('auth_redirect') || '';
+  if (redirectParam === 'account' && !existingRedirect.startsWith('pricing.html')) {
     console.log('[FocusShield] Found redirect parameter, saving redirect target: account.html');
     sessionStorage.setItem('auth_redirect', 'account.html');
   }
