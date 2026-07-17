@@ -314,6 +314,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (days) days.textContent = 'Unlock this feature for 10 minutes by completing the challenges below.';
     }
 
+    const subtextEl = document.getElementById('subtext-message');
+    if (subtextEl) {
+      subtextEl.innerHTML = 'You chose to block this feature to protect your focus and deep work.<br>Stay dedicated until your timer ends, you got this 👊';
+    }
+
     const dividerText = document.getElementById('divider-text');
     if (dividerText) dividerText.textContent = 'unlock feature';
   } else if (isScheduleType) {
