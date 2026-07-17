@@ -414,7 +414,7 @@
     </div>
   </footer>
 
-  <script src="https://cdn.paddle.com/paddlejs/v3/paddle.js"></script>
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
   <script src="supabase.js?v=2"></script>
   <script src="app.js?v=5"></script>
   <script>
@@ -487,16 +487,16 @@
           proBtn.style.boxShadow = 'none';
         }
       }
-      // Initialize Paddle Sandbox
-      Paddle.Initialize({ 
-        token: 'test_5a6451b88aa7a5e5856b7f521b3', 
-        environment: 'sandbox',
+      // Initialize Paddle Billing (Sandbox)
+      Paddle.Environment.set('sandbox');
+      Paddle.Setup({ 
+        vendor: 0, // Not used for Billing but required by Setup
         eventCallback: function(data) {
-          if (data.name === 'checkout.completed') {
-            const email = data.data.customer.email || (session ? session.email : '');
-            if (window.authEngine) {
+          if (data.event === 'Checkout.Complete') {
+            const email = (data.checkoutData && data.checkoutData.user && data.checkoutData.user.email) || (session ? session.email : '');
+            if (window.authEngine && email) {
               window.authEngine.upgradeToPremium(email).then(() => {
-                successModal.style.display = 'flex';
+                if (successModal) successModal.style.display = 'flex';
               });
             }
           }
@@ -509,22 +509,25 @@
         lifetime: 'pri_01kxrks7p2r4g8wee3kmkvx9f3'
       };
 
+      function openPaddleCheckout(planType) {
+        const priceId = priceMap[planType || 'yearly'];
+        if (!priceId) return;
+        const email = session ? session.email : '';
+        Paddle.Checkout.open({
+          settings: {
+            displayMode: 'overlay',
+            theme: 'dark',
+            locale: 'en'
+          },
+          items: [{ priceId: priceId, quantity: 1 }],
+          customer: email ? { email: email } : undefined
+        });
+      }
+
       document.querySelectorAll('.checkout-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const planType = btn.getAttribute('data-plan-type') || 'yearly';
-          const priceId = priceMap[planType];
-          
-          if (!priceId) {
-            console.error('Invalid price ID for plan type:', planType);
-            return;
-          }
-
-          Paddle.Checkout.open({
-            items: [{ priceId: priceId, quantity: 1 }],
-            customer: {
-              email: session ? session.email : ''
-            }
-          });
+          openPaddleCheckout(planType);
         });
       });
 
@@ -533,14 +536,7 @@
       const planParam = urlParams.get('plan');
       if (planParam && priceMap[planParam]) {
         selectProPlan(planParam);
-        setTimeout(() => {
-          Paddle.Checkout.open({
-            items: [{ priceId: priceMap[planParam], quantity: 1 }],
-            customer: {
-              email: session ? session.email : ''
-            }
-          });
-        }, 500); // Small timeout to ensure Paddle is fully loaded
+        setTimeout(() => openPaddleCheckout(planParam), 800);
       }
     });
   </script>
