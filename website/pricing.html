@@ -196,9 +196,9 @@
           <div class="pop-pill" id="pro-popular-badge">Most Popular</div>
           <div class="pc-label">Pro</div>
           <div class="card-switcher">
-            <button type="button" class="sw-btn" data-type="monthly" onclick="selectProPlan('monthly')">Monthly</button>
-            <button type="button" class="sw-btn active" data-type="yearly" onclick="selectProPlan('yearly')">Yearly</button>
-            <button type="button" class="sw-btn" data-type="lifetime" onclick="selectProPlan('lifetime')">Lifetime</button>
+            <button type="button" class="sw-btn" data-type="monthly">Monthly</button>
+            <button type="button" class="sw-btn active" data-type="yearly">Yearly</button>
+            <button type="button" class="sw-btn" data-type="lifetime">Lifetime</button>
           </div>
           <div class="pc-price" id="pro-price-num"><sup>$</sup>1.99<span class="per">/mo</span></div>
           <div class="pc-sub" id="pro-billing-sub">7-day free trial, then $23.88/yr. Cancel anytime.</div>
@@ -436,7 +436,15 @@
       document.getElementById('pro-card-container').classList.toggle('pop', d.popular);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('load', () => {
+      // Wire up plan switcher buttons
+      document.querySelectorAll('.sw-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const type = btn.getAttribute('data-type');
+          selectProPlan(type);
+        });
+      });
+
       const checkoutModal = document.getElementById('checkout-modal');
       const successModal  = document.getElementById('success-modal');
       const closeBtn      = document.getElementById('modal-close-btn');
