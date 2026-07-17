@@ -246,6 +246,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const isScheduleType = params.get('type') === 'schedule';
 
+  function getSubfeatureDisplayName(site) {
+    const b = site.toLowerCase();
+    if (b.includes('youtube.com/shorts')) return 'Youtube Shorts';
+    if (b.includes('facebook.com/reels')) return 'Facebook Reels';
+    if (b.includes('facebook.com/messages')) return 'Facebook Messenger';
+    if (b.includes('messenger.com')) return 'Facebook Messenger';
+    if (b.includes('facebook.com/friends')) return 'Facebook Friends';
+    if (b.includes('facebook.com/groups')) return 'Facebook Groups';
+    if (b.includes('facebook.com/pages')) return 'Facebook Pages';
+    if (b.includes('x.com/messages')) return 'Twitter Messages';
+    if (b.includes('x.com/explore')) return 'Twitter Explore';
+    if (b.includes('instagram.com/reels')) return 'Instagram Reels';
+    if (b.includes('instagram.com/explore')) return 'Instagram Explore';
+    if (b.includes('instagram.com/shop')) return 'Instagram Shop';
+    if (b.includes('instagram.com/direct')) return 'Instagram Messages';
+    if (b.includes('instagram.com/stories')) return 'Instagram Stories';
+    if (b.includes('reddit.com/r/popular')) return 'Reddit Popular Feed';
+    if (b.includes('reddit.com/r/all')) return 'Reddit All Feed';
+    if (b.includes('reddit.com/news')) return 'Reddit News Feed';
+    if (b.includes('reddit.com/explore')) return 'Reddit Explore Feed';
+    if (b.includes('tiktok.com/foryou')) return 'TikTok For You';
+    if (b.includes('tiktok.com/following')) return 'TikTok Following';
+    if (b.includes('tiktok.com/live')) return 'TikTok Live';
+    if (b.includes('tiktok.com/shop')) return 'TikTok Shop';
+    if (b.includes('tiktok.com/search')) return 'TikTok Search';
+    if (b.includes('tiktok.com/upload')) return 'TikTok Upload';
+    return site;
+  }
+
   if (isFilterType) {
     const cdCard = document.getElementById('countdown-card');
     if (cdCard) cdCard.style.display = 'none';
@@ -267,29 +296,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const dividerText = document.getElementById('divider-text');
     if (dividerText) dividerText.textContent = 'unlock site';
   } else if (isSubFeatureType) {
-    // Hide countdown, divider, unlock button
+    // Show countdown, divider, unlock button with custom details
     const cdCard = document.getElementById('countdown-card');
     if (cdCard) cdCard.style.display = 'none';
-
-    const divider = document.querySelector('.section-divider');
-    if (divider) divider.style.display = 'none';
-
-    const unlockBtn = document.getElementById('unlock-early-btn');
-    if (unlockBtn) unlockBtn.style.display = 'none';
 
     const schedCard = document.getElementById('schedule-details-card');
     if (schedCard) {
       schedCard.style.display = 'block';
       const label = schedCard.querySelector('.countdown-label');
-      if (label) label.textContent = 'Feature is Blocked';
+      if (label) label.textContent = 'Feature is Blocked by a filter';
       const heading = document.getElementById('schedule-time-range');
       if (heading) {
-        heading.textContent = blockedSite;
+        heading.textContent = getSubfeatureDisplayName(blockedSite);
         heading.style.color = 'var(--accent)';
       }
       const days = document.getElementById('schedule-days-list');
-      if (days) days.textContent = 'This feature is blocked by your FocusShield settings.';
+      if (days) days.textContent = 'Unlock this feature for 10 minutes by completing the challenges below.';
     }
+
+    const dividerText = document.getElementById('divider-text');
+    if (dividerText) dividerText.textContent = 'unlock feature';
   } else if (isScheduleType) {
     // Hide countdown, divider, unlock button
     const cdCard = document.getElementById('countdown-card');
@@ -3058,8 +3084,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 1000);
     };
 
-    if (isFilterType) {
-      addFilterBypass(targetDomain, onUnlockDone);
+    if (isFilterType || isSubFeatureType) {
+      addFilterBypass(isSubFeatureType ? blockedSite : targetDomain, onUnlockDone);
     } else {
       removeHardBlock(blockedSite, onUnlockDone);
     }
