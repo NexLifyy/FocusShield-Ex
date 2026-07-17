@@ -15,18 +15,8 @@ const authService = {
 
   async isPremium() {
     const user = await this.getCurrentUser();
-    if (!user) {
-      // Check if trial is active (trial is premium by default!)
-      const isTrialActive = await new Promise((resolve) => {
-        chrome.storage.local.get(['installDate'], (result) => {
-          const install = result.installDate || Date.now();
-          // 7 days free trial
-          const isActive = (Date.now() - install) < (7 * 24 * 60 * 60 * 1000);
-          resolve(isActive);
-        });
-      });
-      return isTrialActive;
-    }
+    // No user logged in = Free Plan, no automatic trial
+    if (!user) return false;
     return !!user.isPremium;
   },
 
