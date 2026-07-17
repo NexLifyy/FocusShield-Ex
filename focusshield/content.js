@@ -2143,7 +2143,6 @@
             return;
           }
         }
-      }
 
         const css = generateCSS(settings);
         injectCSS(css);
