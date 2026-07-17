@@ -487,8 +487,9 @@
           proBtn.style.boxShadow = 'none';
         }
       }
-      // Initialize Paddle Billing API (sandbox mode via test_ token)
+      // Initialize Paddle Billing API — sandbox environment MUST be set before Initialize
       try {
+        Paddle.Environment.set('sandbox');
         Paddle.Initialize({
           token: 'test_5a6451b88aa7a5e5856b7f521b3',
           eventCallback: function(data) {
