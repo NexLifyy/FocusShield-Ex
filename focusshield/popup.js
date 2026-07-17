@@ -2877,7 +2877,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (settingsAccountStatus) {
         settingsAccountStatus.style.display = 'block';
-        settingsAccountStatus.textContent = 'Unlock Pro & cloud sync';
+        settingsAccountStatus.innerHTML = `<span style="display: inline-block; font-size: 9.5px; font-weight: 800; text-transform: uppercase; color: #94a3b8; background: rgba(255, 255, 255, 0.05); padding: 2.5px 7.5px; border-radius: 5px; border: 1px solid rgba(255, 255, 255, 0.1); letter-spacing: 0.05em; margin-top: 2.5px;">Free Plan</span>`;
       }
       if (settingsAccountVisual) {
         settingsAccountVisual.innerHTML = `
