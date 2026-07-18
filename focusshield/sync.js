@@ -1,14 +1,45 @@
 // Reuse global Supabase Client initialized in auth.js to avoid duplicate instances warnings
 let syncSupabaseClient = typeof supabaseClient !== 'undefined' ? supabaseClient : null;
 
+function getJwtStatus(token, expectedUid) {
+  try {
+    if (!token) return { valid: false, error: 'Session token missing. Please open or refresh the FocusShield account page to sync.' };
+    const parts = token.split('.');
+    if (parts.length !== 3) return { valid: false, error: 'Session token format is invalid.' };
+    
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    const payload = JSON.parse(jsonPayload);
+    
+    if (!payload) return { valid: false, error: 'Failed to read token payload.' };
+    
+    const nowSecs = Math.floor(Date.now() / 1000);
+    if (payload.exp && nowSecs >= payload.exp) {
+      return { valid: false, error: 'Session token has expired. Please refresh the FocusShield account page to sync.' };
+    }
+    
+    if (expectedUid && payload.sub !== expectedUid) {
+      return { valid: false, error: `User ID mismatch (expected ${expectedUid}, got ${payload.sub}). Please log out and log in again.` };
+    }
+    
+    return { valid: true, payload };
+  } catch (e) {
+    return { valid: false, error: 'Token verification failed: ' + e.message };
+  }
+}
+
 const syncService = {
   // Sync local data to cloud database
   async backupSettings() {
     const user = await authService.getCurrentUser();
     if (!user) return { success: false, error: 'User not signed in.' };
 
-    if (!user.accessToken) {
-      return { success: false, error: 'Session token missing. Please open or refresh the FocusShield account page to sync.' };
+    const jwtStatus = getJwtStatus(user.accessToken, user.uid);
+    if (!jwtStatus.valid) {
+      return { success: false, error: jwtStatus.error };
     }
 
     if (syncSupabaseClient) {
@@ -76,8 +107,9 @@ const syncService = {
     const user = await authService.getCurrentUser();
     if (!user) return { success: false, error: 'User not signed in.' };
 
-    if (!user.accessToken) {
-      return { success: false, error: 'Session token missing. Please open or refresh the FocusShield account page to sync.' };
+    const jwtStatus = getJwtStatus(user.accessToken, user.uid);
+    if (!jwtStatus.valid) {
+      return { success: false, error: jwtStatus.error };
     }
 
     if (syncSupabaseClient) {
