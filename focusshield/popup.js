@@ -2783,14 +2783,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (msgEl) msgEl.innerHTML = message;
       overlay.style.display = 'flex';
 
-      const btnPaywallClose = document.getElementById('btn-paywall-close');
-      if (btnPaywallClose) {
-        if (settings.sessionUser && settings.sessionUser.uid) {
-          btnPaywallClose.style.display = 'none';
-        } else {
-          btnPaywallClose.style.display = 'inline-block';
+      authService.getCurrentUser().then((user) => {
+        const btnPaywallClose = document.getElementById('btn-paywall-close');
+        if (btnPaywallClose) {
+          if (user && user.uid) {
+            btnPaywallClose.style.display = 'none';
+          } else {
+            btnPaywallClose.style.display = 'inline-block';
+          }
         }
-      }
+      });
 
       // Reset CSS animations for bullets list to replay slides nicely when opened!
       const bullets = document.querySelectorAll('.paywall-bullet-item');
