@@ -43,10 +43,20 @@ const syncService = {
     }
 
     if (syncSupabaseClient) {
-      await syncSupabaseClient.auth.setSession({
+      const { error: sessionError } = await syncSupabaseClient.auth.setSession({
         access_token: user.accessToken,
         refresh_token: ''
       });
+      if (sessionError) {
+        return { success: false, error: 'Session authentication failed: ' + sessionError.message };
+      }
+      const { data: { user: authUser }, error: userError } = await syncSupabaseClient.auth.getUser();
+      if (userError || !authUser) {
+        return { success: false, error: 'Retrieving authenticated user failed: ' + (userError ? userError.message : 'User not found.') };
+      }
+      if (authUser.id !== user.uid) {
+        return { success: false, error: `Authenticated user ID mismatch (expected ${user.uid}, got ${authUser.id}).` };
+      }
     }
 
     return new Promise((resolve) => {
@@ -113,10 +123,20 @@ const syncService = {
     }
 
     if (syncSupabaseClient) {
-      await syncSupabaseClient.auth.setSession({
+      const { error: sessionError } = await syncSupabaseClient.auth.setSession({
         access_token: user.accessToken,
         refresh_token: ''
       });
+      if (sessionError) {
+        return { success: false, error: 'Session authentication failed: ' + sessionError.message };
+      }
+      const { data: { user: authUser }, error: userError } = await syncSupabaseClient.auth.getUser();
+      if (userError || !authUser) {
+        return { success: false, error: 'Retrieving authenticated user failed: ' + (userError ? userError.message : 'User not found.') };
+      }
+      if (authUser.id !== user.uid) {
+        return { success: false, error: `Authenticated user ID mismatch (expected ${user.uid}, got ${authUser.id}).` };
+      }
     }
 
     return new Promise((resolve) => {
