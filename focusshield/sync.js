@@ -7,7 +7,11 @@ const syncService = {
     const user = await authService.getCurrentUser();
     if (!user) return { success: false, error: 'User not signed in.' };
 
-    if (syncSupabaseClient && user.accessToken) {
+    if (!user.accessToken) {
+      return { success: false, error: 'Session token missing. Please open or refresh the FocusShield account page to sync.' };
+    }
+
+    if (syncSupabaseClient) {
       await syncSupabaseClient.auth.setSession({
         access_token: user.accessToken,
         refresh_token: ''
@@ -72,7 +76,11 @@ const syncService = {
     const user = await authService.getCurrentUser();
     if (!user) return { success: false, error: 'User not signed in.' };
 
-    if (syncSupabaseClient && user.accessToken) {
+    if (!user.accessToken) {
+      return { success: false, error: 'Session token missing. Please open or refresh the FocusShield account page to sync.' };
+    }
+
+    if (syncSupabaseClient) {
       await syncSupabaseClient.auth.setSession({
         access_token: user.accessToken,
         refresh_token: ''

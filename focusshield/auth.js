@@ -45,7 +45,7 @@ const authService = {
       if (error) throw error;
       if (!data.user) throw new Error('Sign up failed.');
 
-      const sessionUser = { email, isPremium: false, uid: data.user.id };
+      const sessionUser = { email, isPremium: false, uid: data.user.id, accessToken: data.session ? data.session.access_token : null };
       await new Promise((resolve) => {
         chrome.storage.local.set({ sessionUser }, resolve);
       });
