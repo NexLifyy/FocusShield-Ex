@@ -388,7 +388,7 @@
         } else {
           const capitalizedPlan = userPlanType.charAt(0).toUpperCase() + userPlanType.slice(1);
           subPlanTitle.textContent = `Pro Plan (${capitalizedPlan})`;
-          subPlanDesc.textContent = `Billed ${userPlanType}ly. Cancel anytime to return to the Free plan.`;
+          subPlanDesc.textContent = `Billed ${userPlanType}. Cancel anytime to return to the Free plan.`;
           btnCancelSub.style.display = 'inline-block';
           btnCancelSub.onclick = () => {
             showConfirmDialog('Cancel your Pro subscription? Access will continue until the end of your billing period.', async () => {
@@ -398,7 +398,11 @@
                 const { data: { session } } = await window.supabaseClient.auth.getSession();
                 const res = await fetch('https://evmbcpinujaufvwcxaaa.supabase.co/functions/v1/cancel-subscription', {
                   method: 'POST',
-                  headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' }
+                  headers: {
+                    'apikey': 'sb_publishable_FwqzwLUMWBAAmp6IG75ocQ_0BbOqr_D',
+                    'Authorization': `Bearer ${session.access_token}`,
+                    'Content-Type': 'application/json'
+                  }
                 });
                 const result = await res.json();
                 if (res.ok) {
