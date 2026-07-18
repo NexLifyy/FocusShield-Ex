@@ -258,5 +258,30 @@ const syncService = {
         }, 800);
       }
     });
+  },
+  
+  async deleteBackup() {
+    const user = await authService.getCurrentUser();
+    if (!user) return { success: true };
+
+    if (syncSupabaseClient) {
+      const { error: sessionError } = await syncSupabaseClient.auth.setSession({
+        access_token: user.accessToken,
+        refresh_token: user.refreshToken || ''
+      });
+      if (sessionError) {
+        return { success: false, error: 'Session authentication failed: ' + sessionError.message };
+      }
+      
+      const { error } = await syncSupabaseClient
+        .from('backups')
+        .delete()
+        .eq('user_id', user.uid);
+        
+      if (error) {
+        return { success: false, error: error.message };
+      }
+    }
+    return { success: true };
   }
 };

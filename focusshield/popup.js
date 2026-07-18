@@ -798,33 +798,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClearStats = document.getElementById('btn-clear-stats');
   if (btnClearStats) {
     btnClearStats.addEventListener('click', () => {
-      if (btnClearStats.textContent.trim() === 'Reset') {
+      const currentText = btnClearStats.textContent.trim();
+      if (currentText === 'Delete') {
         btnClearStats.textContent = 'Confirm?';
         btnClearStats.style.background = '#ef4444';
         btnClearStats.style.color = '#ffffff';
         btnClearStats.style.borderColor = '#ef4444';
         
         btnClearStats.timeoutId = setTimeout(() => {
-          btnClearStats.textContent = 'Reset';
+          btnClearStats.textContent = 'Delete';
           btnClearStats.style.background = 'rgba(239, 68, 68, 0.12)';
           btnClearStats.style.color = '#ef4444';
           btnClearStats.style.borderColor = 'rgba(239, 68, 68, 0.2)';
         }, 3000);
-      } else {
+      } else if (currentText === 'Confirm?') {
         if (btnClearStats.timeoutId) clearTimeout(btnClearStats.timeoutId);
         
-        chrome.storage.local.clear(() => {
-          chrome.storage.local.set(defaultSettings, () => {
-            showToast('All FocusShield data cleared', 'success');
-            settings = mergeWithDefaults(defaultSettings);
-            applySettingsToUI();
-            renderInsights();
-            renderSchedules();
-            
-            btnClearStats.textContent = 'Reset';
-            btnClearStats.style.background = 'rgba(239, 68, 68, 0.12)';
-            btnClearStats.style.color = '#ef4444';
-            btnClearStats.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+        showToast('Deleting data...', 'info');
+        syncService.deleteBackup().then((res) => {
+          if (!res.success) {
+            console.warn('[Sync] Failed to delete cloud backup:', res.error);
+          }
+          
+          chrome.storage.local.clear(() => {
+            chrome.storage.local.set(defaultSettings, () => {
+              showToast('All FocusShield data deleted', 'success');
+              settings = mergeWithDefaults(defaultSettings);
+              applySettingsToUI();
+              renderInsights();
+              renderSchedules();
+              
+              btnClearStats.textContent = 'Delete';
+              btnClearStats.style.background = 'rgba(239, 68, 68, 0.12)';
+              btnClearStats.style.color = '#ef4444';
+              btnClearStats.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+            });
           });
         });
       }
