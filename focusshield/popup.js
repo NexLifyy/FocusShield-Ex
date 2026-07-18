@@ -3036,9 +3036,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (cancelBtn) {
             cancelBtn.textContent = 'Cancel';
             cancelBtn.style.display = 'inline-block';
-            cancelBtn.style.background = '';
-            cancelBtn.style.color = '';
-            cancelBtn.style.borderColor = '';
+            cancelBtn.style.background = 'rgba(239, 68, 68, 0.1)';
+            cancelBtn.style.color = '#ef4444';
+            cancelBtn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
             if (!cancelBtn.dataset.bound) {
               cancelBtn.dataset.bound = 'true';
               cancelBtn.addEventListener('click', () => {
