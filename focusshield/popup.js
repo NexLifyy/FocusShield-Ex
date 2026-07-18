@@ -799,15 +799,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnClearStats) {
     btnClearStats.addEventListener('click', () => {
       const currentText = btnClearStats.textContent.trim();
-      if (currentText === 'Delete') {
+      if (currentText === 'Clear Cloud Backup') {
         btnClearStats.textContent = 'Confirm?';
         btnClearStats.style.background = '#ef4444';
         btnClearStats.style.color = '#ffffff';
         btnClearStats.style.borderColor = '#ef4444';
         
         btnClearStats.timeoutId = setTimeout(() => {
-          btnClearStats.textContent = 'Delete';
-          btnClearStats.style.background = 'rgba(239, 68, 68, 0.12)';
+          btnClearStats.textContent = 'Clear Cloud Backup';
+          btnClearStats.style.background = 'rgba(239, 68, 68, 0.08)';
           btnClearStats.style.color = '#ef4444';
           btnClearStats.style.borderColor = 'rgba(239, 68, 68, 0.2)';
         }, 3000);
@@ -837,8 +837,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderSchedules();
                 updateAccountUI();
                 
-                btnClearStats.textContent = 'Delete';
-                btnClearStats.style.background = 'rgba(239, 68, 68, 0.12)';
+                btnClearStats.textContent = 'Clear Cloud Backup';
+                btnClearStats.style.background = 'rgba(239, 68, 68, 0.08)';
                 btnClearStats.style.color = '#ef4444';
                 btnClearStats.style.borderColor = 'rgba(239, 68, 68, 0.2)';
               });
@@ -846,6 +846,42 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         });
       }
+    });
+  }
+
+  // Force Sync Now Button inside Popup Settings
+  const btnPopupForceSync = document.getElementById('btn-popup-force-sync');
+  if (btnPopupForceSync) {
+    btnPopupForceSync.addEventListener('click', () => {
+      btnPopupForceSync.textContent = 'Syncing...';
+      btnPopupForceSync.disabled = true;
+      const syncLabel = document.getElementById('popup-last-sync-time');
+      if (syncLabel) syncLabel.textContent = 'Last Synced: Syncing...';
+      
+      authService.getCurrentUser().then((user) => {
+        if (!user) {
+          showToast('Please login to use Cloud Backup', 'error');
+          btnPopupForceSync.textContent = 'Force Sync Now';
+          btnPopupForceSync.disabled = false;
+          if (syncLabel) syncLabel.textContent = 'Last Synced: Not Logged In';
+          return;
+        }
+        
+        syncService.backupSettings().then((res) => {
+          btnPopupForceSync.textContent = 'Force Sync Now';
+          btnPopupForceSync.disabled = false;
+          if (res.success) {
+            showToast('Cloud backup completed successfully!', 'success');
+            if (syncLabel) {
+              const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              syncLabel.textContent = `Last Synced: ${timeStr}`;
+            }
+          } else {
+            showToast(`Backup failed: ${res.error}`, 'error');
+            if (syncLabel) syncLabel.textContent = 'Last Synced: Failed';
+          }
+        });
+      });
     });
   }
 

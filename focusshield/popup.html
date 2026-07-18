@@ -595,15 +595,23 @@
                 </label>
               </div>
 
-              <!-- Reset Data Card -->
+              <!-- Cloud Backup Card -->
               <div class="card no-hover" style="padding: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; display: flex !important; flex-direction: column !important; gap: 12px; align-items: stretch !important; justify-content: flex-start !important; box-sizing: border-box; transition: none;">
-                <div style="display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid var(--border); padding-bottom: 10px; width: 100%;">
-                  <h3 style="font-family: inherit; font-size: 13.5px; font-weight: 700; margin: 0; color: #ef4444;">Clear FocusShield</h3>
-                  <p style="font-size: 10.5px; color: var(--text-3); margin: 4px 0 0 0; line-height: 1.45;">Permanently delete all FocusShield data, including your local configurations, custom sites, schedules, and cloud backups. You will remain signed in.</p>
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; width: 100%; gap: 12px;">
+                  <div style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
+                    <h3 style="font-family: inherit; font-size: 13.5px; font-weight: 700; margin: 0; color: var(--accent);">Cloud Backup</h3>
+                    <p style="font-size: 10.5px; color: var(--text-3); margin: 4px 0 0 0; line-height: 1.45;">Synchronizes your configuration, custom sites, schedules, and analytics history automatically across all of your browsers.</p>
+                  </div>
+                  <div style="display: flex; align-items: center; margin-top: 2px;">
+                    <span style="font-size: 9px; color: var(--sky); background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.15); padding: 3px 8px; border-radius: 12px; font-weight: 700; white-space: nowrap; letter-spacing: 0.02em;" id="popup-last-sync-time">Last Synced: Just now</span>
+                  </div>
                 </div>
-                <div style="display: flex; gap: 10px; margin-top: 2px; width: 100%; justify-content: flex-start;">
-                  <button id="btn-clear-stats" title="Reset Data" style="padding: 6px 14px; background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s ease; white-space: nowrap;">
-                    Delete
+                <div style="display: flex; gap: 8px; margin-top: 2px; width: 100%; justify-content: flex-start; flex-wrap: wrap;">
+                  <button id="btn-popup-force-sync" style="padding: 6px 12px; background: rgba(56, 189, 248, 0.08); color: var(--sky); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s ease; white-space: nowrap;">
+                    Force Sync Now
+                  </button>
+                  <button id="btn-clear-stats" style="padding: 6px 12px; background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s ease; white-space: nowrap;">
+                    Clear Cloud Backup
                   </button>
                 </div>
               </div>
