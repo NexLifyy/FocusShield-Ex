@@ -873,6 +873,24 @@
     </div>
   </div>
 
+  <!-- CUSTOM IN-APP CONFIRMATION MODAL OVERLAY -->
+  <div id="confirm-dialog-overlay" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(8px); z-index: 1002; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;">
+    <div style="background: #121212; border: 1px solid var(--border); border-radius: 16px; padding: 20px; width: 100%; max-width: 280px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; text-align: left; position: relative;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <h4 id="confirm-dialog-title" style="font-size: 14px; font-weight: 800; color: #fff; margin: 0; letter-spacing: -0.01em;">Confirm Action</h4>
+        <p id="confirm-dialog-msg" style="font-size: 11px; color: var(--text-3); line-height: 1.5; margin: 0; font-weight: 500;">Are you sure you want to proceed?</p>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; width: 100%;">
+        <button id="confirm-dialog-cancel-btn" style="padding: 6px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text-secondary); font-size: 11.5px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s;">
+          Cancel
+        </button>
+        <button id="confirm-dialog-ok-btn" style="padding: 6px 14px; background: var(--accent); border: none; border-radius: 8px; color: #000; font-size: 11.5px; font-weight: 800; cursor: pointer; font-family: inherit; transition: all 0.2s;">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="supabase.js"></script>
   <script src="config.js"></script>
   <script src="auth.js"></script>

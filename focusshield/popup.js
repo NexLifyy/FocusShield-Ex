@@ -798,54 +798,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClearStats = document.getElementById('btn-clear-stats');
   if (btnClearStats) {
     btnClearStats.addEventListener('click', () => {
-      const currentText = btnClearStats.textContent.trim();
-      if (currentText === 'Clear Cloud Backup') {
-        btnClearStats.textContent = 'Confirm?';
-        btnClearStats.style.background = '#ef4444';
-        btnClearStats.style.color = '#ffffff';
-        btnClearStats.style.borderColor = '#ef4444';
-        
-        btnClearStats.timeoutId = setTimeout(() => {
-          btnClearStats.textContent = 'Clear Cloud Backup';
-          btnClearStats.style.background = 'rgba(239, 68, 68, 0.08)';
-          btnClearStats.style.color = '#ef4444';
-          btnClearStats.style.borderColor = 'rgba(239, 68, 68, 0.2)';
-        }, 3000);
-      } else if (currentText === 'Confirm?') {
-        if (btnClearStats.timeoutId) clearTimeout(btnClearStats.timeoutId);
-        
-        showToast('Deleting data...', 'info');
-        syncService.deleteBackup().then((res) => {
-          if (!res.success) {
-            console.warn('[Sync] Failed to delete cloud backup:', res.error);
-          }
-          
-          chrome.storage.local.get(['sessionUser'], (result) => {
-            const preservedSession = result.sessionUser || null;
+      showPopupConfirm(
+        'Clear FocusShield',
+        'Permanently delete all FocusShield data, including your local configurations, custom sites, schedules, and cloud backups. You will remain signed in.',
+        () => {
+          showToast('Deleting data...', 'info');
+          syncService.deleteBackup().then((res) => {
+            if (!res.success) {
+              console.warn('[Sync] Failed to delete cloud backup:', res.error);
+            }
             
-            chrome.storage.local.clear(() => {
-              const newSettings = { ...defaultSettings };
-              if (preservedSession) {
-                newSettings.sessionUser = preservedSession;
-              }
+            chrome.storage.local.get(['sessionUser'], (result) => {
+              const preservedSession = result.sessionUser || null;
               
-              chrome.storage.local.set(newSettings, () => {
-                showToast('All FocusShield data deleted', 'success');
-                settings = mergeWithDefaults(newSettings);
-                applySettingsToUI();
-                renderInsights();
-                renderSchedules();
-                updateAccountUI();
+              chrome.storage.local.clear(() => {
+                const newSettings = { ...defaultSettings };
+                if (preservedSession) {
+                  newSettings.sessionUser = preservedSession;
+                }
                 
-                btnClearStats.textContent = 'Clear Cloud Backup';
-                btnClearStats.style.background = 'rgba(239, 68, 68, 0.08)';
-                btnClearStats.style.color = '#ef4444';
-                btnClearStats.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                chrome.storage.local.set(newSettings, () => {
+                  showToast('All FocusShield data deleted', 'success');
+                  settings = mergeWithDefaults(newSettings);
+                  applySettingsToUI();
+                  renderInsights();
+                  renderSchedules();
+                  updateAccountUI();
+                });
               });
             });
           });
-        });
-      }
+        }
+      );
     });
   }
 
@@ -2366,6 +2350,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2500);
   }
 
+  // ── APP-THEMED CONFIRMATION MODAL HELPER ──
+  function showPopupConfirm(title, message, onConfirm) {
+    const overlay = document.getElementById('confirm-dialog-overlay');
+    if (!overlay) return;
+
+    const titleEl = document.getElementById('confirm-dialog-title');
+    const msgEl = document.getElementById('confirm-dialog-msg');
+    const btnCancel = document.getElementById('confirm-dialog-cancel-btn');
+    const btnOk = document.getElementById('confirm-dialog-ok-btn');
+
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.textContent = message;
+
+    overlay.style.display = 'flex';
+
+    const closeDialog = () => {
+      overlay.style.display = 'none';
+    };
+
+    btnCancel.onclick = () => {
+      closeDialog();
+    };
+
+    btnOk.onclick = () => {
+      closeDialog();
+      onConfirm();
+    };
+  }
+
   // Helper: Import current active website domain into schedule domain input
   function handleImportCurrentSite() {
     const domainInput = document.getElementById('sched-domain');
@@ -3004,59 +3017,42 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!cancelBtn.dataset.bound) {
               cancelBtn.dataset.bound = 'true';
               cancelBtn.addEventListener('click', () => {
-                const currentText = cancelBtn.textContent.trim();
-                if (currentText === 'Cancel') {
-                  cancelBtn.textContent = 'Confirm?';
-                  cancelBtn.style.background = '#ef4444';
-                  cancelBtn.style.color = '#ffffff';
-                  cancelBtn.style.borderColor = '#ef4444';
-                  
-                  cancelBtn.timeoutId = setTimeout(() => {
-                    cancelBtn.textContent = 'Cancel';
-                    cancelBtn.style.background = 'rgba(239, 68, 68, 0.1)';
-                    cancelBtn.style.color = '#ef4444';
-                    cancelBtn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
-                  }, 3000);
-                } else if (currentText === 'Confirm?') {
-                  if (cancelBtn.timeoutId) clearTimeout(cancelBtn.timeoutId);
-                  
-                  cancelBtn.textContent = 'Canceling...';
-                  cancelBtn.disabled = true;
-                  
-                  fetch('https://evmbcpinujaufvwcxaaa.supabase.co/functions/v1/cancel-subscription', {
-                    method: 'POST',
-                    headers: {
-                      'apikey': 'sb_publishable_FwqzwLUMWBAAmp6IG75ocQ_0BbOqr_D',
-                      'Authorization': `Bearer ${user.accessToken}`,
-                      'Content-Type': 'application/json'
-                    }
-                  })
-                  .then(async (res) => {
-                    const result = await res.json();
-                    cancelBtn.textContent = 'Cancel';
-                    cancelBtn.disabled = false;
-                    cancelBtn.style.background = 'rgba(239, 68, 68, 0.1)';
-                    cancelBtn.style.color = '#ef4444';
-                    cancelBtn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                showPopupConfirm(
+                  'Cancel Subscription',
+                  'Cancel your Pro subscription? You will keep Pro access until the end of your billing period.',
+                  () => {
+                    cancelBtn.textContent = 'Canceling...';
+                    cancelBtn.disabled = true;
                     
-                    if (res.ok) {
-                      showToast('Subscription canceled. Pro access continues until end of billing period.', 'success');
-                      setTimeout(() => {
-                        updateAccountUI();
-                      }, 1500);
-                    } else {
-                      showToast(result.message || 'Could not cancel subscription.', 'error');
-                    }
-                  })
-                  .catch((err) => {
-                    cancelBtn.textContent = 'Cancel';
-                    cancelBtn.disabled = false;
-                    cancelBtn.style.background = 'rgba(239, 68, 68, 0.1)';
-                    cancelBtn.style.color = '#ef4444';
-                    cancelBtn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
-                    showToast('Network error. Please try again.', 'error');
-                  });
-                }
+                    fetch('https://evmbcpinujaufvwcxaaa.supabase.co/functions/v1/cancel-subscription', {
+                      method: 'POST',
+                      headers: {
+                        'apikey': 'sb_publishable_FwqzwLUMWBAAmp6IG75ocQ_0BbOqr_D',
+                        'Authorization': `Bearer ${user.accessToken}`,
+                        'Content-Type': 'application/json'
+                      }
+                    })
+                    .then(async (res) => {
+                      const result = await res.json();
+                      cancelBtn.textContent = 'Cancel';
+                      cancelBtn.disabled = false;
+                      
+                      if (res.ok) {
+                        showToast('Subscription canceled. Pro access continues until end of billing period.', 'success');
+                        setTimeout(() => {
+                          updateAccountUI();
+                        }, 1500);
+                      } else {
+                        showToast(result.message || 'Could not cancel subscription.', 'error');
+                      }
+                    })
+                    .catch((err) => {
+                      cancelBtn.textContent = 'Cancel';
+                      cancelBtn.disabled = false;
+                      showToast('Network error. Please try again.', 'error');
+                    });
+                  }
+                );
               });
             }
           }
