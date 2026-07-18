@@ -429,7 +429,8 @@
       document.getElementById('pro-price-num').innerHTML   = d.html;
       document.getElementById('pro-billing-sub').innerHTML = d.billing;
       const btn = document.getElementById('pro-card-cta');
-      btn.textContent = d.cta;
+      // Store the default CTA as data attribute — updateProBtn will decide actual text for Pro users
+      btn.setAttribute('data-default-cta', d.cta);
       btn.setAttribute('data-plan', d.planName);
       btn.setAttribute('data-price', d.priceVal);
       btn.setAttribute('data-plan-type', type);
@@ -442,6 +443,8 @@
         btn.addEventListener('click', () => {
           const type = btn.getAttribute('data-type');
           selectProPlan(type);
+          // updateProBtn is called inside renderPricingButtons — trigger it via custom event
+          document.dispatchEvent(new CustomEvent('plan-tab-changed'));
         });
       });
 
@@ -524,9 +527,12 @@
           const viewingPlan = activeSw ? activeSw.getAttribute('data-type') : 'yearly';
 
           if (!isPro) {
-            // Not pro — normal checkout buttons (handled by checkout-btn class)
+            // Free user — restore default CTA text from data attribute
             proBtn.disabled = false;
             proBtn.style.cssText = '';
+            proBtn.onclick = null;
+            const defaultCta = proBtn.getAttribute('data-default-cta');
+            if (defaultCta) proBtn.textContent = defaultCta;
             return;
           }
 
@@ -580,8 +586,15 @@
           }
         }
 
-        // Re-render pro btn on switcher click
-        swBtns.forEach(btn => btn.addEventListener('click', () => setTimeout(updateProBtn, 50)));
+        // Listen for tab changes and re-render immediately
+        document.addEventListener('plan-tab-changed', updateProBtn);
+        
+        // If user is Pro, highlight their current plan tab on load
+        if (isPro && planType !== 'lifetime') {
+          selectProPlan(planType);
+        } else if (!isPro) {
+          selectProPlan('yearly'); // Default to yearly tab for non-pro
+        }
         updateProBtn();
       }
 
