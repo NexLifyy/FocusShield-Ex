@@ -436,7 +436,7 @@
       document.getElementById('pro-card-container').classList.toggle('pop', d.popular);
     }
 
-    window.addEventListener('load', () => {
+    window.addEventListener('load', async () => {
       // Wire up plan switcher buttons
       document.querySelectorAll('.sw-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -445,48 +445,150 @@
         });
       });
 
-      const checkoutModal = document.getElementById('checkout-modal');
-      const successModal  = document.getElementById('success-modal');
-      const closeBtn      = document.getElementById('modal-close-btn');
-      const planNameEl    = document.getElementById('checkout-plan-name');
-      const planPriceEl   = document.getElementById('checkout-plan-price');
-      const emailInput    = document.getElementById('checkout-email');
-      const session = JSON.parse(localStorage.getItem('focusshield_mock_session') || 'null');
-      if (session) {
-        emailInput.value = session.email;
-        const freeBtn = document.getElementById('free-plan-btn');
-        const proBtn = document.getElementById('pro-card-cta');
-        
-        if (freeBtn) {
-          if (!session.isPremium) {
-            freeBtn.textContent = 'Activated';
-            freeBtn.href = '#';
-            freeBtn.style.pointerEvents = 'none';
-            freeBtn.style.background = 'rgba(61, 220, 132, 0.1)';
-            freeBtn.style.borderColor = 'rgba(61, 220, 132, 0.2)';
-            freeBtn.style.color = 'var(--accent)';
-            freeBtn.style.opacity = '1';
-          } else {
-            freeBtn.textContent = 'Move back to Free';
-            freeBtn.href = 'account.html';
-            freeBtn.style.pointerEvents = 'auto';
-            freeBtn.style.opacity = '1';
-            freeBtn.style.background = 'rgba(255, 255, 255, 0.04)';
-            freeBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-            freeBtn.style.color = 'var(--text-secondary)';
-          }
-        }
-        
-        if (proBtn && session.isPremium) {
-          proBtn.textContent = 'Activated';
-          proBtn.disabled = true;
-          proBtn.style.pointerEvents = 'none';
-          proBtn.style.background = 'rgba(61, 220, 132, 0.1)';
-          proBtn.style.border = '1px solid rgba(61, 220, 132, 0.2)';
-          proBtn.style.color = 'var(--accent)';
-          proBtn.style.boxShadow = 'none';
+      const successModal = document.getElementById('success-modal');
+      const emailInput   = document.getElementById('checkout-email');
+
+      // ── Fetch live plan info from Supabase ──
+      let userPlanType = 'free';
+      let userSession  = null;
+      if (window.supabaseClient) {
+        const { data } = await window.supabaseClient.auth.getSession();
+        userSession = data?.session ?? null;
+        if (userSession) {
+          emailInput.value = userSession.user.email || '';
+          const { data: profile } = await window.supabaseClient
+            .from('profiles').select('plan_type, is_premium').eq('id', userSession.user.id).maybeSingle();
+          if (profile) userPlanType = profile.plan_type || (profile.is_premium ? 'monthly' : 'free');
         }
       }
+
+      // ── Render smart buttons based on plan_type ──
+      function renderPricingButtons(planType) {
+        const freeBtn = document.getElementById('free-plan-btn');
+        const proBtn  = document.getElementById('pro-card-cta');
+        const swBtns  = document.querySelectorAll('.sw-btn');
+
+        const isPro = planType !== 'free';
+
+        // Free card button
+        if (freeBtn) {
+          if (!isPro) {
+            // User is on free — show Activated
+            freeBtn.textContent = 'Activated';
+            freeBtn.removeAttribute('href');
+            freeBtn.style.cssText = 'pointer-events:none;background:rgba(61,220,132,0.1);border-color:rgba(61,220,132,0.2);color:var(--accent);opacity:1;cursor:default;';
+            freeBtn.onclick = null;
+          } else if (planType !== 'lifetime') {
+            // User is on monthly/yearly — allow cancel
+            freeBtn.textContent = 'Move back to Free';
+            freeBtn.removeAttribute('href');
+            freeBtn.style.cssText = 'pointer-events:auto;opacity:1;background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.15);color:var(--text-secondary);cursor:pointer;';
+            freeBtn.onclick = async (e) => {
+              e.preventDefault();
+              if (!confirm('Cancel your Pro subscription? You will keep Pro access until the end of your billing period.')) return;
+              freeBtn.textContent = 'Canceling...';
+              freeBtn.style.pointerEvents = 'none';
+              try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                const res = await fetch('https://evmbcpinujaufvwcxaaa.supabase.co/functions/v1/cancel-subscription', {
+                  method: 'POST',
+                  headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' }
+                });
+                const result = await res.json();
+                if (res.ok) {
+                  alert('Subscription canceled. Pro access continues until end of billing period.');
+                  window.location.reload();
+                } else {
+                  alert('Error: ' + (result.message || 'Could not cancel subscription.'));
+                  freeBtn.textContent = 'Move back to Free';
+                  freeBtn.style.pointerEvents = 'auto';
+                }
+              } catch(err) {
+                alert('Network error. Please try again.');
+                freeBtn.textContent = 'Move back to Free';
+                freeBtn.style.pointerEvents = 'auto';
+              }
+            };
+          } else {
+            // Lifetime — no downgrade option
+            freeBtn.textContent = 'Lifetime Plan Active';
+            freeBtn.style.cssText = 'pointer-events:none;opacity:0.4;cursor:default;';
+            freeBtn.onclick = null;
+          }
+        }
+
+        // Pro card CTA — update based on currently selected switcher tab
+        function updateProBtn() {
+          if (!proBtn) return;
+          const activeSw = document.querySelector('.sw-btn.active');
+          const viewingPlan = activeSw ? activeSw.getAttribute('data-type') : 'yearly';
+
+          if (!isPro) {
+            // Not pro — normal checkout buttons (handled by checkout-btn class)
+            proBtn.disabled = false;
+            proBtn.style.cssText = '';
+            return;
+          }
+
+          if (viewingPlan === planType) {
+            // Viewing current plan → Activated
+            proBtn.textContent = 'Activated';
+            proBtn.disabled = true;
+            proBtn.style.cssText = 'pointer-events:none;background:rgba(61,220,132,0.1);border:1px solid rgba(61,220,132,0.2);color:var(--accent);box-shadow:none;cursor:default;';
+            proBtn.onclick = null;
+          } else if (planType === 'lifetime') {
+            // Lifetime users — everything included
+            proBtn.textContent = 'Included in Lifetime';
+            proBtn.disabled = true;
+            proBtn.style.cssText = 'pointer-events:none;background:rgba(61,220,132,0.1);border:1px solid rgba(61,220,132,0.2);color:var(--accent);box-shadow:none;cursor:default;';
+            proBtn.onclick = null;
+          } else if (viewingPlan === 'lifetime') {
+            // Upgrading to lifetime → open checkout directly
+            proBtn.textContent = 'Upgrade to Lifetime Pro';
+            proBtn.disabled = false;
+            proBtn.style.cssText = 'pointer-events:auto;cursor:pointer;';
+            proBtn.onclick = () => openPaddleCheckout('lifetime');
+          } else {
+            // Switching between monthly ↔ yearly
+            const label = viewingPlan === 'yearly' ? 'Upgrade to Yearly Pro' : 'Switch to Monthly Pro';
+            proBtn.textContent = label;
+            proBtn.disabled = false;
+            proBtn.style.cssText = 'pointer-events:auto;cursor:pointer;';
+            proBtn.onclick = async () => {
+              proBtn.textContent = 'Updating...';
+              proBtn.disabled = true;
+              try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                const res = await fetch('https://evmbcpinujaufvwcxaaa.supabase.co/functions/v1/update-subscription', {
+                  method: 'POST',
+                  headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ plan: viewingPlan })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                  alert(`Plan updated to ${viewingPlan}! Changes take effect immediately.`);
+                  window.location.reload();
+                } else {
+                  alert('Error: ' + (result.message || 'Could not update plan.'));
+                  window.location.reload();
+                }
+              } catch(err) {
+                alert('Network error. Please try again.');
+                window.location.reload();
+              }
+            };
+          }
+        }
+
+        // Re-render pro btn on switcher click
+        swBtns.forEach(btn => btn.addEventListener('click', () => setTimeout(updateProBtn, 50)));
+        updateProBtn();
+      }
+
+      renderPricingButtons(userPlanType);
+
+
+
       // Initialize Paddle Billing API — sandbox environment MUST be set before Initialize
       try {
         Paddle.Environment.set('sandbox');
@@ -494,11 +596,13 @@
           token: 'test_5a6451b88aa7a5e5856b7f521b3',
           eventCallback: function(data) {
             if (data.name === 'checkout.completed') {
-              const email = (data.data && data.data.customer && data.data.customer.email) || (session ? session.email : '');
+              const email = (data.data && data.data.customer && data.data.customer.email) || (userSession ? userSession.user.email : '');
               if (window.authEngine && email) {
                 window.authEngine.upgradeToPremium(email).then(() => {
                   if (successModal) successModal.style.display = 'flex';
                 });
+              } else if (successModal) {
+                successModal.style.display = 'flex';
               }
             }
           }
