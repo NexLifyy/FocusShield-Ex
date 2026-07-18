@@ -2286,6 +2286,16 @@
           lastSyncedSessionStr = sessionStr;
           if (sessionStr) {
             const session = JSON.parse(sessionStr);
+            let token = session.accessToken || null;
+            if (!token) {
+              try {
+                const rawSbToken = localStorage.getItem('sb-evmbcpinujaufvwcxaaa-auth-token');
+                if (rawSbToken) {
+                  const parsedSbToken = JSON.parse(rawSbToken);
+                  token = parsedSbToken.access_token || null;
+                }
+              } catch (err) {}
+            }
             chrome.runtime.sendMessage({
               type: 'SYNC_WEBSITE_SESSION',
               session: {
@@ -2293,7 +2303,7 @@
                 email: session.email,
                 fullName: session.fullName || '',
                 isPremium: !!session.isPremium,
-                accessToken: session.accessToken
+                accessToken: token
               }
             }, () => {
               if (chrome.runtime.lastError) { /* ignore mismatch runtime errors */ }
