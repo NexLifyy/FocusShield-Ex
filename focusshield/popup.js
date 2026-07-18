@@ -3004,7 +3004,28 @@ document.addEventListener('DOMContentLoaded', () => {
           plan = 'yearly';
         }
         
-        if (plan === 'lifetime') {
+        if (plan.endsWith('_cancelled')) {
+          if (planTitleEl) planTitleEl.textContent = 'Pro Plan (Cancelled)';
+          if (planDescEl) planDescEl.textContent = 'Your subscription is cancelled. You will have Pro features until the end of your billing period.';
+          if (cancelBtn) {
+            cancelBtn.textContent = 'Subscribe Again';
+            cancelBtn.style.display = 'inline-block';
+            cancelBtn.style.background = 'var(--accent)';
+            cancelBtn.style.color = '#000';
+            cancelBtn.style.borderColor = 'var(--accent)';
+            if (!cancelBtn.dataset.bound) {
+              cancelBtn.dataset.bound = 'true';
+              cancelBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const currentText = cancelBtn.textContent.trim();
+                if (currentText === 'Subscribe Again') {
+                  chrome.tabs.create({ url: FOCUSSHIELD_CONFIG.checkoutUrl || 'https://getfocusshield.site/pricing.html' });
+                  return;
+                }
+              });
+            }
+          }
+        } else if (plan === 'lifetime') {
           if (planTitleEl) planTitleEl.textContent = 'Pro Plan (Lifetime)';
           if (planDescEl) planDescEl.textContent = 'One-time purchase active. Full premium updates included forever.';
           if (cancelBtn) cancelBtn.style.display = 'none';
@@ -3013,10 +3034,19 @@ document.addEventListener('DOMContentLoaded', () => {
           if (planTitleEl) planTitleEl.textContent = `Pro Plan (${capitalizedPlan})`;
           if (planDescEl) planDescEl.textContent = `Billed ${plan}. Cancel anytime to return to the Free plan.`;
           if (cancelBtn) {
+            cancelBtn.textContent = 'Cancel';
             cancelBtn.style.display = 'inline-block';
+            cancelBtn.style.background = '';
+            cancelBtn.style.color = '';
+            cancelBtn.style.borderColor = '';
             if (!cancelBtn.dataset.bound) {
               cancelBtn.dataset.bound = 'true';
               cancelBtn.addEventListener('click', () => {
+                const currentText = cancelBtn.textContent.trim();
+                if (currentText === 'Subscribe Again') {
+                  chrome.tabs.create({ url: FOCUSSHIELD_CONFIG.checkoutUrl || 'https://getfocusshield.site/pricing.html' });
+                  return;
+                }
                 showPopupConfirm(
                   'Cancel Subscription',
                   'Cancel your Pro subscription? You will keep Pro access until the end of your billing period.',

@@ -385,11 +385,27 @@
           subPlanTitle.textContent = 'Pro Plan (Lifetime)';
           subPlanDesc.textContent = 'One-time purchase active. Full premium updates included forever.';
           btnCancelSub.style.display = 'none'; // Lifetime cannot be canceled
+        } else if (userPlanType.endsWith('_cancelled')) {
+          subPlanTitle.textContent = 'Pro Plan (Cancelled)';
+          subPlanDesc.textContent = 'Your subscription is cancelled. You will have Pro features until the end of your billing period.';
+          btnCancelSub.textContent = 'Subscribe Again';
+          btnCancelSub.style.display = 'inline-block';
+          btnCancelSub.style.background = 'var(--accent)';
+          btnCancelSub.style.color = '#000';
+          btnCancelSub.style.borderColor = 'var(--accent)';
+          btnCancelSub.onclick = (e) => {
+            e.preventDefault();
+            window.location.href = 'pricing.html';
+          };
         } else {
           const capitalizedPlan = userPlanType.charAt(0).toUpperCase() + userPlanType.slice(1);
           subPlanTitle.textContent = `Pro Plan (${capitalizedPlan})`;
           subPlanDesc.textContent = `Billed ${userPlanType}. Cancel anytime to return to the Free plan.`;
           btnCancelSub.style.display = 'inline-block';
+          btnCancelSub.textContent = 'Cancel Subscription';
+          btnCancelSub.style.background = '';
+          btnCancelSub.style.color = '';
+          btnCancelSub.style.borderColor = '';
           btnCancelSub.onclick = () => {
             showConfirmDialog('Cancel your Pro subscription? Access will continue until the end of your billing period.', async () => {
               btnCancelSub.textContent = 'Canceling...';
