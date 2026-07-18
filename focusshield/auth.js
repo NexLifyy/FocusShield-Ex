@@ -45,7 +45,7 @@ const authService = {
       if (error) throw error;
       if (!data.user) throw new Error('Sign up failed.');
 
-      const sessionUser = { email, isPremium: false, uid: data.user.id, accessToken: data.session ? data.session.access_token : null };
+      const sessionUser = { email, isPremium: false, uid: data.user.id, accessToken: data.session ? data.session.access_token : null, refreshToken: data.session ? data.session.refresh_token : null };
       await new Promise((resolve) => {
         chrome.storage.local.set({ sessionUser }, resolve);
       });
@@ -78,7 +78,7 @@ const authService = {
         .maybeSingle();
 
       const isPremium = profile ? profile.is_premium : false;
-      const sessionUser = { email, isPremium, uid: data.user.id, accessToken: data.session.access_token };
+      const sessionUser = { email, isPremium, uid: data.user.id, accessToken: data.session.access_token, refreshToken: data.session.refresh_token };
       await new Promise((resolve) => {
         chrome.storage.local.set({ sessionUser }, resolve);
       });

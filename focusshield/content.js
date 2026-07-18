@@ -2287,12 +2287,14 @@
           if (sessionStr) {
             const session = JSON.parse(sessionStr);
             let token = session.accessToken || null;
-            if (!token) {
+            let refreshToken = session.refreshToken || null;
+            if (!token || !refreshToken) {
               try {
                 const rawSbToken = localStorage.getItem('sb-evmbcpinujaufvwcxaaa-auth-token');
                 if (rawSbToken) {
                   const parsedSbToken = JSON.parse(rawSbToken);
-                  token = parsedSbToken.access_token || null;
+                  if (!token) token = parsedSbToken.access_token || null;
+                  if (!refreshToken) refreshToken = parsedSbToken.refresh_token || null;
                 }
               } catch (err) {}
             }
@@ -2303,7 +2305,8 @@
                 email: session.email,
                 fullName: session.fullName || '',
                 isPremium: !!session.isPremium,
-                accessToken: token
+                accessToken: token,
+                refreshToken: refreshToken
               }
             }, () => {
               if (chrome.runtime.lastError) { /* ignore mismatch runtime errors */ }

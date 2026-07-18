@@ -45,7 +45,7 @@ const syncService = {
     if (syncSupabaseClient) {
       const { error: sessionError } = await syncSupabaseClient.auth.setSession({
         access_token: user.accessToken,
-        refresh_token: ''
+        refresh_token: user.refreshToken || ''
       });
       if (sessionError) {
         return { success: false, error: 'Session authentication failed: ' + sessionError.message };
@@ -125,7 +125,7 @@ const syncService = {
     if (syncSupabaseClient) {
       const { error: sessionError } = await syncSupabaseClient.auth.setSession({
         access_token: user.accessToken,
-        refresh_token: ''
+        refresh_token: user.refreshToken || ''
       });
       if (sessionError) {
         return { success: false, error: 'Session authentication failed: ' + sessionError.message };

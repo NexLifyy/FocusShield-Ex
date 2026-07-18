@@ -81,7 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
             email: session.user.email,
             fullName: fullName,
             isPremium: isPremium,
-            accessToken: session.access_token
+            accessToken: session.access_token,
+            refreshToken: session.refresh_token
           };
           localStorage.setItem('focusshield_mock_session', JSON.stringify(loggedUser));
           if (window.authEngine && window.authEngine.broadcastSession) {
@@ -207,7 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
           email: data.user.email,
           fullName: fullName,
           isPremium: isPremium,
-          accessToken: data.session.access_token
+          accessToken: data.session.access_token,
+          refreshToken: data.session.refresh_token
         };
         localStorage.setItem('focusshield_mock_session', JSON.stringify(loggedUser));
         this.broadcastSession(loggedUser);
