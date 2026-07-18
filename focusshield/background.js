@@ -1,5 +1,5 @@
 // FocusShield Background Service Worker
-importScripts('config.js', 'auth.js');
+importScripts('supabase.js', 'config.js', 'auth.js', 'sync.js');
 
 const defaultSettings = {
   masterToggle: true,
@@ -770,9 +770,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'SYNC_WEBSITE_SESSION') {
     chrome.storage.local.set({ sessionUser: message.session }, () => {
       console.log('[Background] Synced session from website:', message.session);
+      
+      // Notify active popup or views if open
       chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: { sessionUser: message.session } }, () => {
         if (chrome.runtime.lastError) { /* ignore if popup is closed */ }
       });
+
+      // ── AUTO RESTORE SETTINGS IF PRO USER ──
+      if (message.session && message.session.isPremium) {
+        console.log('[Background] User is Premium. Automatically restoring cloud settings...');
+        if (typeof syncService !== 'undefined') {
+          syncService.restoreSettings().then((res) => {
+            if (res.success) {
+              console.log('[Background] Auto-restored cloud settings successfully.');
+              // Fetch latest merged settings and notify popup
+              chrome.storage.local.get(null, (result) => {
+                const updatedSettings = mergeWithDefaults(result);
+                chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: updatedSettings }, () => {
+                  if (chrome.runtime.lastError) { /* ignore if popup is closed */ }
+                });
+              });
+            } else {
+              console.warn('[Background] Auto-restore failed:', res.error);
+            }
+          }).catch(err => {
+            console.error('[Background] Error running restoreSettings:', err);
+          });
+        }
+      }
+
       sendResponse({ success: true });
     });
     return true;

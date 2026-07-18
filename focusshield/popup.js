@@ -526,6 +526,18 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       });
+      // ── AUTO BACKUP FOR PRO USERS ──
+      authService.isPremium().then((isPro) => {
+        if (isPro) {
+          syncService.backupSettings().then((res) => {
+            if (res.success) {
+              console.log('[Sync] Auto-backed up settings successfully.');
+            } else {
+              console.warn('[Sync] Auto-backup failed:', res.error);
+            }
+          });
+        }
+      });
     });
   }
 
@@ -2954,10 +2966,20 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await authService.signIn(email, password);
         showToast('Successfully signed in!', 'success');
-        await checkPremiumStatus();
+        const isPro = await checkPremiumStatus();
         updateAccountUI();
         updateTrialBanner();
         
+        if (isPro) {
+          showToast('Restoring cloud settings...', 'info');
+          const res = await syncService.restoreSettings();
+          if (res.success) {
+            showToast('Settings restored from cloud!', 'success');
+          } else {
+            console.warn('[Sync] Auto-restore on login failed:', res.error);
+          }
+        }
+
         // Re-render settings and list limits
         chrome.storage.local.get(null, (result) => {
           settings = mergeWithDefaults(result);
