@@ -3,6 +3,24 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 // ── Paddle Webhook Secret ──
 const PADDLE_WEBHOOK_SECRET = 'ntfset_01kxrneyhx38byacse6bjztfer';
 
+// ── Events that GRANT Pro access ──
+const GRANT_EVENTS = new Set([
+  'transaction.completed',   // Lifetime one-time payment
+  'subscription.created',    // New subscription started
+  'subscription.activated',  // Trial converted to paid
+  'subscription.resumed',    // Paused subscription resumed
+]);
+
+// ── Events that REVOKE Pro access ──
+const REVOKE_EVENTS = new Set([
+  'subscription.canceled',   // User canceled subscription
+  'subscription.expired',    // Subscription fully expired
+  'subscription.paused',     // Payment paused (Dunning)
+]);
+
+// ── All events we care about ──
+const HANDLED_EVENTS = new Set([...GRANT_EVENTS, ...REVOKE_EVENTS]);
+
 // ── Verify Paddle HMAC-SHA256 Signature ──
 async function verifyPaddleSignature(
   rawBody: string,
@@ -12,7 +30,10 @@ async function verifyPaddleSignature(
 
   // Header format: ts=TIMESTAMP;h1=HASH
   const parts = Object.fromEntries(
-    signatureHeader.split(';').map((p) => p.split('=') as [string, string])
+    signatureHeader.split(';').map((p) => {
+      const idx = p.indexOf('=');
+      return [p.slice(0, idx), p.slice(idx + 1)] as [string, string];
+    })
   );
   const ts = parts['ts'];
   const h1 = parts['h1'];
@@ -39,13 +60,14 @@ async function verifyPaddleSignature(
 function extractEmail(event: Record<string, unknown>): string | null {
   try {
     const data = event.data as Record<string, unknown>;
-    // transaction.completed / subscription.created share this path
+
+    // Primary path: data.customer.email (subscriptions + transactions)
     const customer = data?.customer as Record<string, unknown> | undefined;
     if (customer?.email) return customer.email as string;
 
-    // Fallback: check address / billing details
-    const address = data?.address as Record<string, unknown> | undefined;
-    if (address?.email) return address.email as string;
+    // Fallback: data.items[0].price.billing_cycle (some events nest differently)
+    const billingDetails = data?.billing_details as Record<string, unknown> | undefined;
+    if (billingDetails?.email) return billingDetails.email as string;
 
     return null;
   } catch {
@@ -53,8 +75,45 @@ function extractEmail(event: Record<string, unknown>): string | null {
   }
 }
 
+// ── Efficient user lookup by email via profiles table ──
+async function findUserIdByEmail(
+  supabase: ReturnType<typeof createClient>,
+  email: string
+): Promise<string | null> {
+  // Query profiles table directly — much faster than listUsers()
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', email.toLowerCase())
+    .maybeSingle();
+
+  if (error) {
+    console.error('[paddle-webhook] Profile lookup error:', error);
+    return null;
+  }
+  return data?.id ?? null;
+}
+
+// ── Set premium status in Supabase ──
+async function setPremiumStatus(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  isPremium: boolean
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ is_premium: isPremium, updated_at: new Date().toISOString() })
+    .eq('id', userId);
+
+  if (error) {
+    console.error('[paddle-webhook] Failed to update profile:', error);
+    return false;
+  }
+  return true;
+}
+
+// ── Main Handler ──
 Deno.serve(async (req) => {
-  // Only accept POST
   if (req.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 });
   }
@@ -62,10 +121,10 @@ Deno.serve(async (req) => {
   const rawBody = await req.text();
   const signatureHeader = req.headers.get('Paddle-Signature');
 
-  // ── Verify signature ──
+  // Verify Paddle signature
   const valid = await verifyPaddleSignature(rawBody, signatureHeader);
   if (!valid) {
-    console.error('[paddle-webhook] Invalid signature');
+    console.error('[paddle-webhook] Invalid signature — possible spoofed request');
     return new Response('Unauthorized', { status: 401 });
   }
 
@@ -77,58 +136,45 @@ Deno.serve(async (req) => {
   }
 
   const eventType = event.event_type as string;
-  console.log('[paddle-webhook] Received event:', eventType);
+  console.log('[paddle-webhook] Received:', eventType);
 
-  // ── Only handle relevant events ──
-  const relevantEvents = [
-    'transaction.completed',
-    'subscription.created',
-    'subscription.activated',
-  ];
-  if (!relevantEvents.includes(eventType)) {
-    return new Response('OK - Event ignored', { status: 200 });
+  // Ignore events we don't handle
+  if (!HANDLED_EVENTS.has(eventType)) {
+    console.log('[paddle-webhook] Ignoring unhandled event:', eventType);
+    return new Response('OK', { status: 200 });
   }
 
   const email = extractEmail(event);
   if (!email) {
-    console.error('[paddle-webhook] No email found in event:', JSON.stringify(event));
+    console.error('[paddle-webhook] No email in event:', eventType);
+    // Return 200 so Paddle doesn't retry — not recoverable
     return new Response('OK - No email found', { status: 200 });
   }
 
-  // ── Connect to Supabase with service role (bypasses RLS) ──
+  // Connect to Supabase with service role (bypasses RLS)
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   );
 
-  // ── Find user by email in auth.users ──
-  const { data: users, error: userError } = await supabase.auth.admin.listUsers();
-  if (userError) {
-    console.error('[paddle-webhook] Failed to list users:', userError);
-    return new Response('Internal Error', { status: 500 });
-  }
-
-  const user = users.users.find(
-    (u) => u.email?.toLowerCase() === email.toLowerCase()
-  );
-
-  if (!user) {
-    console.warn('[paddle-webhook] No Supabase user found for email:', email);
-    // Still return 200 so Paddle doesn't retry — the user may not have signed up yet
+  // Efficient email → user ID lookup
+  const userId = await findUserIdByEmail(supabase, email);
+  if (!userId) {
+    console.warn('[paddle-webhook] No user found for email:', email, '| Event:', eventType);
+    // Return 200 — user may not have signed up to website yet
     return new Response('OK - User not found', { status: 200 });
   }
 
-  // ── Update profiles table: is_premium = true ──
-  const { error: updateError } = await supabase
-    .from('profiles')
-    .update({ is_premium: true, updated_at: new Date().toISOString() })
-    .eq('id', user.id);
+  // Determine action
+  const shouldGrant = GRANT_EVENTS.has(eventType);
+  const action = shouldGrant ? 'GRANT' : 'REVOKE';
+  console.log(`[paddle-webhook] ${action} Pro → ${email} (${eventType})`);
 
-  if (updateError) {
-    console.error('[paddle-webhook] Failed to update profile:', updateError);
+  const success = await setPremiumStatus(supabase, userId, shouldGrant);
+  if (!success) {
     return new Response('Internal Error', { status: 500 });
   }
 
-  console.log(`[paddle-webhook] ✅ Granted Pro to ${email} (uid: ${user.id})`);
+  console.log(`[paddle-webhook] ✅ ${action} Pro complete for ${email} (uid: ${userId})`);
   return new Response('OK', { status: 200 });
 });
