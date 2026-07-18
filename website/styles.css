@@ -312,6 +312,13 @@ header.navbar {
   box-shadow: var(--shadow);
 }
 
+.card.no-hover:hover {
+  transform: none;
+  background: var(--card-bg);
+  border-color: var(--border);
+  box-shadow: none;
+}
+
 .card-accent-green:hover::before {
   background: var(--accent);
 }

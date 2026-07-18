@@ -43,7 +43,6 @@
   <main class="account-container" style="flex:1;">
     <div class="account-header-row">
       <h1 style="font-family: var(--font-headings); font-weight: 800; font-size: 32px; letter-spacing: -1px;">Account Settings</h1>
-      <button onclick="window.authEngine.logout()" class="btn btn-secondary">Logout</button>
     </div>
 
     <!-- Profile card -->
@@ -64,9 +63,9 @@
     </div>
 
     <!-- Active Subscription Details Card -->
-    <div class="card" id="subscription-card" style="padding: 24px; margin-bottom: 24px; display:flex; flex-direction:column; gap:16px;">
+    <div class="card no-hover" id="subscription-card" style="padding: 24px; margin-bottom: 24px; display:flex; flex-direction:column; gap:16px;">
       <div style="border-bottom:1px solid var(--border); padding-bottom:12px;">
-        <h3 style="font-family: var(--font-headings); font-size: 18px; font-weight: 700; margin:0;">Active Subscription</h3>
+        <h3 style="font-family: var(--font-headings); font-size: 18px; font-weight: 700; margin:0; color: var(--accent);">Active Subscription</h3>
       </div>
       <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
         <div>
@@ -87,23 +86,13 @@
     </div>
 
     <!-- Premium dashboard features (Cloud backup details) -->
-    <div class="card" style="padding: 28px; margin-bottom: 24px; display:flex; flex-direction:column; gap:16px;">
-      <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:14px;">
-        <h3 style="font-family: var(--font-headings); font-size: 18px; font-weight: 700; margin:0;">Cloud Synchronization</h3>
-        <span style="font-size:11.5px; color:var(--text-muted);" id="last-sync-time">Last Synced: Just now</span>
-      </div>
-      
-      <!-- Sync details -->
-      <div style="display:flex; flex-direction:column; gap:14px;">
-        <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px;">
-          <div style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:50%; background:rgba(61,220,132,0.15); color:var(--accent);">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:2px;">
-            <span style="font-size:13.5px; font-weight:700; color:#fff;">Chrome Extension Connection</span>
-            <span style="font-size:12px; color:var(--text-secondary);" id="sync-connection-desc">Connected & backing up changes automatically</span>
-          </div>
+    <div class="card no-hover" style="padding: 28px; margin-bottom: 24px; display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:14px; flex-wrap: wrap; gap: 8px;">
+        <div style="display:flex; flex-direction:column;">
+          <h3 style="font-family: var(--font-headings); font-size: 18px; font-weight: 700; margin:0; color: var(--accent);">Cloud Backup</h3>
+          <p style="font-size:12.5px; color:var(--text-muted); margin:4px 0 0 0;">Synchronizes your configuration, custom sites, schedules, and analytics history automatically across all of your browsers.</p>
         </div>
+        <span style="font-size:11.5px; color:var(--text-muted); white-space: nowrap;" id="last-sync-time">Last Synced: Just now</span>
       </div>
       
       <div style="display:flex; gap:12px; margin-top:8px;">
@@ -424,7 +413,7 @@
 
         // Sync settings
         syncStatus.textContent = 'Automatic cloud backup active (Pro)';
-        syncConnectionDesc.textContent = 'Connected & backing up changes automatically';
+        if (syncConnectionDesc) syncConnectionDesc.textContent = 'Connected & backing up changes automatically';
       } else {
         // Render Free status
         userPlanBadge.textContent = 'Free Plan';
@@ -436,7 +425,7 @@
         promoBanner.style.display = 'flex';
 
         syncStatus.textContent = 'Automatic cloud backup active (Free)';
-        syncConnectionDesc.textContent = 'Settings and schedules synced to the cloud';
+        if (syncConnectionDesc) syncConnectionDesc.textContent = 'Settings and schedules synced to the cloud';
       }
 
       // Sync button events
