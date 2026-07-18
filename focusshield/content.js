@@ -2324,7 +2324,8 @@
     
     // Check on load, periodically, instantly on custom event, and on page unload
     syncSessionWithExtension();
-    setInterval(syncSessionWithExtension, 1000);
+    setInterval(syncSessionWithExtension, 500);
+    window.addEventListener('authChange', syncSessionWithExtension);
     document.addEventListener('focusshield-session-updated', syncSessionWithExtension);
     window.addEventListener('beforeunload', syncSessionWithExtension);
   }
