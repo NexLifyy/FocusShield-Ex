@@ -461,7 +461,14 @@
           emailInput.value = userSession.user.email || '';
           const { data: profile } = await window.supabaseClient
             .from('profiles').select('plan_type, is_premium').eq('id', userSession.user.id).maybeSingle();
-          if (profile) userPlanType = profile.plan_type || (profile.is_premium ? 'monthly' : 'free');
+          if (profile) {
+            if (profile.is_premium) {
+              // If the database has plan_type as 'free' or null, but they are premium, default to 'yearly' (or monthly/lifetime)
+              userPlanType = (profile.plan_type && profile.plan_type !== 'free') ? profile.plan_type : 'yearly';
+            } else {
+              userPlanType = 'free';
+            }
+          }
         }
       }
 
