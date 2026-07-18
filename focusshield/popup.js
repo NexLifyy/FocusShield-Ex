@@ -450,6 +450,34 @@ document.addEventListener('DOMContentLoaded', () => {
     detectCurrentSite();
     startGlobalPopupTimer();
     renderSchedules();
+
+    // ── CHECK AND TRIGGER SYNC / LOGOUT POPUPS ──
+    const current = result.sessionUser || null;
+    const lastSeen = result.lastSeenSession || null;
+
+    // Save/update the lastSeenSession state for the next check
+    const nextLastSeen = current ? { uid: current.uid, isPremium: !!current.isPremium } : { uid: null, isPremium: false };
+    chrome.storage.local.set({ lastSeenSession: nextLastSeen });
+
+    if (lastSeen) {
+      if (lastSeen.uid && !current) {
+        // User logged out
+        if (lastSeen.isPremium) {
+          showSyncModal('pro-logout');
+        } else {
+          showSyncModal('free-logout');
+        }
+      } else if ((!lastSeen.uid || lastSeen.uid !== current?.uid) && current && current.isPremium) {
+        // User logged in as premium
+        showSyncModal('pro-login');
+      }
+    } else {
+      // If lastSeen doesn't exist, this is first load after install/update
+      // If premium user is already logged in, show restoring data modal just in case
+      if (current && current.isPremium) {
+        showSyncModal('pro-login');
+      }
+    }
   });
 
   // Apply settings properties to UI controls
@@ -2757,6 +2785,104 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function showSyncModal(type, onClose) {
+    const overlay = document.getElementById('sync-dialog-overlay');
+    const iconContainer = document.getElementById('sync-modal-icon-container');
+    const titleEl = document.getElementById('sync-modal-title');
+    const msgEl = document.getElementById('sync-modal-message');
+    const progressContainer = document.getElementById('sync-modal-progress-container');
+    const progressBar = document.getElementById('sync-modal-progress-bar');
+    const actionsEl = document.getElementById('sync-modal-actions');
+    const glowEl = document.getElementById('sync-modal-glow');
+
+    if (!overlay) return;
+
+    overlay.style.display = 'flex';
+    actionsEl.innerHTML = '';
+    progressContainer.style.display = 'none';
+
+    if (type === 'pro-logout') {
+      glowEl.style.background = 'radial-gradient(circle, rgba(234, 179, 8, 0.15) 0%, rgba(234, 179, 8, 0) 70%)';
+      iconContainer.style.background = 'rgba(234, 179, 8, 0.08)';
+      iconContainer.style.border = '1px solid rgba(234, 179, 8, 0.2)';
+      iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>`;
+      titleEl.textContent = 'Logged Out';
+      msgEl.textContent = 'You are logged out. Log in again to access Pro features and restore your data.';
+
+      const btnLogin = document.createElement('button');
+      btnLogin.className = 'btn-upgrade-paddle';
+      btnLogin.style.cssText = 'width: 100%; padding: 10px; background: linear-gradient(90deg, #eab308, #f59e0b); color: #000; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 11.5px;';
+      btnLogin.textContent = 'Log In Again';
+      btnLogin.onclick = () => {
+        overlay.style.display = 'none';
+        showSubview('settings');
+        const overlayPaywall = document.getElementById('paywall-overlay');
+        if (overlayPaywall) overlayPaywall.style.display = 'flex';
+      };
+
+      const btnDismiss = document.createElement('button');
+      btnDismiss.style.cssText = 'background: none; border: none; color: var(--text-3); font-size: 11px; cursor: pointer; font-family: inherit; margin-top: 4px;';
+      btnDismiss.textContent = 'Dismiss';
+      btnDismiss.onclick = () => {
+        overlay.style.display = 'none';
+        if (onClose) onClose();
+      };
+
+      actionsEl.appendChild(btnLogin);
+      actionsEl.appendChild(btnDismiss);
+
+    } else if (type === 'free-logout') {
+      glowEl.style.background = 'radial-gradient(circle, rgba(244, 63, 94, 0.15) 0%, rgba(244, 63, 94, 0) 70%)';
+      iconContainer.style.background = 'rgba(244, 63, 94, 0.08)';
+      iconContainer.style.border = '1px solid rgba(244, 63, 94, 0.2)';
+      iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19A3.5 3.5 0 0 0 21 15.5c0-2.79-2.54-4.5-5-4.5-.42-1.04-1.21-1.88-2.22-2.38"/><path d="M9.5 19H7a5 5 0 0 1-.5-9.98c.19-2.8 2.22-5 4.88-5c1.86 0 3.5 1.07 4.14 2.65"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`;
+      titleEl.textContent = 'Logged Out';
+      msgEl.textContent = 'You are logged out. Your data is not backed up. Upgrade to Pro!';
+
+      const btnUpgrade = document.createElement('button');
+      btnUpgrade.className = 'btn-upgrade-paddle';
+      btnUpgrade.style.cssText = 'width: 100%; padding: 10px; background: linear-gradient(90deg, var(--accent), #56e29f); color: #000; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 11.5px;';
+      btnUpgrade.textContent = 'Upgrade to Pro';
+      btnUpgrade.onclick = () => {
+        overlay.style.display = 'none';
+        showPaywall('site', 'Upgrade to Pro', 'Unlock cloud sync, custom schedules, and advanced blocking rules!');
+      };
+
+      const btnDismiss = document.createElement('button');
+      btnDismiss.style.cssText = 'background: none; border: none; color: var(--text-3); font-size: 11px; cursor: pointer; font-family: inherit; margin-top: 4px;';
+      btnDismiss.textContent = 'Dismiss';
+      btnDismiss.onclick = () => {
+        overlay.style.display = 'none';
+        if (onClose) onClose();
+      };
+
+      actionsEl.appendChild(btnUpgrade);
+      actionsEl.appendChild(btnDismiss);
+
+    } else if (type === 'pro-login') {
+      glowEl.style.background = 'radial-gradient(circle, rgba(61, 220, 132, 0.15) 0%, rgba(61, 220, 132, 0) 70%)';
+      iconContainer.style.background = 'rgba(61, 220, 132, 0.08)';
+      iconContainer.style.border = '1px solid rgba(61, 220, 132, 0.2)';
+      iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+      titleEl.textContent = 'Restoring Data...';
+      msgEl.textContent = 'You are logged in! We are restoring your cloud settings and focus history...';
+      
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '0%';
+
+      // Simulate progress bar filling up
+      setTimeout(() => { progressBar.style.width = '35%'; }, 100);
+      setTimeout(() => { progressBar.style.width = '70%'; }, 500);
+      setTimeout(() => { 
+        progressBar.style.width = '100%'; 
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          if (onClose) onClose();
+        }, 300);
+      }, 1200);
+    }
+  }
+
   async function updateAccountUI() {
     const user = await authService.getCurrentUser();
     const isPremium = await authService.isPremium();
@@ -2964,18 +3090,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       try {
-        await authService.signIn(email, password);
+        const loggedUser = await authService.signIn(email, password);
         showToast('Successfully signed in!', 'success');
         const isPro = await checkPremiumStatus();
         updateAccountUI();
         updateTrialBanner();
         
         if (isPro) {
-          showToast('Restoring cloud settings...', 'info');
+          // Set lastSeenSession so it doesn't trigger on reload again
+          chrome.storage.local.set({ lastSeenSession: { uid: loggedUser.uid, isPremium: true } });
+          showSyncModal('pro-login');
           const res = await syncService.restoreSettings();
-          if (res.success) {
-            showToast('Settings restored from cloud!', 'success');
-          } else {
+          if (!res.success) {
             console.warn('[Sync] Auto-restore on login failed:', res.error);
           }
         }
@@ -3023,6 +3149,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAuthSignout = document.getElementById('btn-auth-signout');
   if (btnAuthSignout) {
     btnAuthSignout.addEventListener('click', async () => {
+      const wasPremium = isPremiumActive; // Store premium status before logging out
       await authService.signOut(); // Clears sessionUser from storage
       showToast('Signed out successfully.', 'success');
       
@@ -3032,6 +3159,15 @@ document.addEventListener('DOMContentLoaded', () => {
           await checkPremiumStatus();
           updateAccountUI();
           updateTrialBanner();
+
+          // Set the lastSeenSession state to logged out to prevent double-alerts on reload
+          chrome.storage.local.set({ lastSeenSession: { uid: null, isPremium: false } }, () => {
+            if (wasPremium) {
+              showSyncModal('pro-logout');
+            } else {
+              showSyncModal('free-logout');
+            }
+          });
 
           // Re-render settings and list limits
           chrome.storage.local.get(null, (result) => {
@@ -3086,13 +3222,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (message.type === 'SETTINGS_UPDATED') {
       console.log('[Popup] Settings/session updated in background, refreshing popup UI...');
       chrome.storage.local.get(null, async (result) => {
+        const previousSession = settings.sessionUser || null;
         settings = mergeWithDefaults(result);
+        const currentSession = settings.sessionUser || null;
+        
         await checkPremiumStatus();
         updateAccountUI();
         updateTrialBanner();
         applySettingsToUI();
         renderCustomSites();
         renderSchedules();
+
+        // Check if state changed to show modals in real time
+        const nextLastSeen = currentSession ? { uid: currentSession.uid, isPremium: !!currentSession.isPremium } : { uid: null, isPremium: false };
+        chrome.storage.local.set({ lastSeenSession: nextLastSeen });
+
+        if (previousSession && !currentSession) {
+          // Logged out
+          if (previousSession.isPremium) {
+            showSyncModal('pro-logout');
+          } else {
+            showSyncModal('free-logout');
+          }
+        } else if ((!previousSession || previousSession.uid !== currentSession?.uid) && currentSession && currentSession.isPremium) {
+          // Logged in as premium
+          showSyncModal('pro-login');
+        }
       });
     }
   });
