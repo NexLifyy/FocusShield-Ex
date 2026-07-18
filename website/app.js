@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const emailTarget = customEmail || (user ? user.email : null);
       if (!emailTarget) return;
 
-      if (supabaseClient && user && user.email === emailTarget) {
+      if (supabaseClient && user) {
         const { error } = await supabaseClient
           .from('profiles')
           .update({ is_premium: true, plan_type: planType })
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Sync local session & mock users list
-      if (user && user.email === emailTarget) {
+      if (user) {
         user.isPremium = true;
         user.planType = planType;
         localStorage.setItem('focusshield_mock_session', JSON.stringify(user));
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Update general mock list
       const users = this.getUsers();
-      const userIdx = users.findIndex(u => u.email === emailTarget);
+      const userIdx = users.findIndex(u => u.email.toLowerCase() === emailTarget.toLowerCase());
       if (userIdx !== -1) {
         users[userIdx].isPremium = true;
         users[userIdx].planType = planType;
