@@ -2205,8 +2205,8 @@
 
       // Sync session changes back to the website if page is open (for name updates or signouts)
       if (changes.sessionUser) {
-        const syncHost = window.location.hostname.toLowerCase();
-        if (syncHost.includes('getfocusshield.site') || syncHost.includes('localhost') || syncHost.includes('127.0.0.1')) {
+        const syncUrl = window.location.href.toLowerCase();
+        if (syncUrl.includes('getfocusshield.site') || syncUrl.includes('localhost') || syncUrl.includes('127.0.0.1') || (window.location.protocol === 'file:' && syncUrl.includes('/website/'))) {
           try {
             const newUser = changes.sessionUser.newValue;
             if (newUser) {
@@ -2275,8 +2275,8 @@
   }, 500);
 
   // ── Sync Website Auth State to Chrome Extension ──
-  const syncHostname = window.location.hostname.toLowerCase();
-  if (syncHostname.includes('getfocusshield.site') || syncHostname.includes('localhost') || syncHostname.includes('127.0.0.1')) {
+  const syncUrl = window.location.href.toLowerCase();
+  if (syncUrl.includes('getfocusshield.site') || syncUrl.includes('localhost') || syncUrl.includes('127.0.0.1') || (window.location.protocol === 'file:' && syncUrl.includes('/website/'))) {
     let lastSyncedSessionStr = null;
     
     function syncSessionWithExtension() {
