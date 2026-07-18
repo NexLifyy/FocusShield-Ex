@@ -804,12 +804,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
   if (message.type === 'CLEAR_WEBSITE_SESSION') {
-    chrome.storage.local.remove(['sessionUser'], () => {
-      console.log('[Background] Cleared session (website logout)');
-      chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: { sessionUser: null } }, () => {
-        if (chrome.runtime.lastError) { /* ignore if popup is closed */ }
+    chrome.storage.local.clear(() => {
+      chrome.storage.local.set(defaultSettings, () => {
+        console.log('[Background] Cleared session and settings to defaults (website logout)');
+        chrome.runtime.sendMessage({ type: 'SETTINGS_UPDATED', settings: defaultSettings }, () => {
+          if (chrome.runtime.lastError) { /* ignore if popup is closed */ }
+        });
+        sendResponse({ success: true });
       });
-      sendResponse({ success: true });
     });
     return true;
   }

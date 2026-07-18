@@ -3023,17 +3023,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAuthSignout = document.getElementById('btn-auth-signout');
   if (btnAuthSignout) {
     btnAuthSignout.addEventListener('click', async () => {
-      await authService.signOut();
+      await authService.signOut(); // Clears sessionUser from storage
       showToast('Signed out successfully.', 'success');
-      await checkPremiumStatus();
-      updateAccountUI();
-      updateTrialBanner();
+      
+      // Clear all settings to defaults
+      chrome.storage.local.clear(() => {
+        chrome.storage.local.set(defaultSettings, async () => {
+          await checkPremiumStatus();
+          updateAccountUI();
+          updateTrialBanner();
 
-      // Re-render settings and list limits
-      chrome.storage.local.get(null, (result) => {
-        settings = mergeWithDefaults(result);
-        applySettingsToUI();
-        renderCustomSites();
+          // Re-render settings and list limits
+          chrome.storage.local.get(null, (result) => {
+            settings = mergeWithDefaults(result);
+            applySettingsToUI();
+            renderCustomSites();
+          });
+        });
       });
     });
   }
