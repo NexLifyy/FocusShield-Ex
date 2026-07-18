@@ -2985,7 +2985,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const planDescEl = document.getElementById('popup-pro-plan-desc');
         const cancelBtn = document.getElementById('btn-popup-cancel-sub');
         
-        const plan = user.planType || 'yearly';
+        let plan = user.planType || 'yearly';
+        if (plan === 'free') {
+          plan = 'yearly';
+        }
         
         if (plan === 'lifetime') {
           if (planTitleEl) planTitleEl.textContent = 'Pro Plan (Lifetime)';

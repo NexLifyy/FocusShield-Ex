@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .maybeSingle();
 
           const isPremium = profile ? profile.is_premium : false;
-          const planType = profile && profile.plan_type ? profile.plan_type : 'yearly';
+          const planType = (profile && profile.plan_type && profile.plan_type !== 'free') ? profile.plan_type : (isPremium ? 'yearly' : 'free');
           
           const loggedUser = {
             uid: session.user.id,
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
           .maybeSingle();
 
         const isPremium = profile ? profile.is_premium : false;
-        const planType = profile && profile.plan_type ? profile.plan_type : 'yearly';
+        const planType = (profile && profile.plan_type && profile.plan_type !== 'free') ? profile.plan_type : (isPremium ? 'yearly' : 'free');
         const fullName = data.user.user_metadata ? (data.user.user_metadata.full_name || '') : '';
         const loggedUser = {
           uid: data.user.id,
