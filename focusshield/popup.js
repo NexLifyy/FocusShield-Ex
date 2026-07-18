@@ -3004,7 +3004,35 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!cancelBtn.dataset.bound) {
               cancelBtn.dataset.bound = 'true';
               cancelBtn.addEventListener('click', () => {
-                showToast('Network error. Please try again.', 'error');
+                if (confirm('Cancel your Pro subscription? You will keep Pro access until the end of your billing period.')) {
+                  cancelBtn.textContent = 'Canceling...';
+                  cancelBtn.disabled = true;
+                  
+                  fetch('https://evmbcpinujaufvwcxaaa.supabase.co/functions/v1/cancel-subscription', {
+                    method: 'POST',
+                    headers: {
+                      'apikey': 'sb_publishable_FwqzwLUMWBAAmp6IG75ocQ_0BbOqr_D',
+                      'Authorization': `Bearer ${user.accessToken}`,
+                      'Content-Type': 'application/json'
+                    }
+                  })
+                  .then(async (res) => {
+                    const result = await res.json();
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.disabled = false;
+                    
+                    if (res.ok) {
+                      showToast('Subscription canceled. Pro access continues until end of billing period.', 'success');
+                    } else {
+                      showToast(result.message || 'Could not cancel subscription.', 'error');
+                    }
+                  })
+                  .catch((err) => {
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.disabled = false;
+                    showToast('Network error. Please try again.', 'error');
+                  });
+                }
               });
             }
           }
