@@ -589,11 +589,11 @@
         // Listen for tab changes and re-render immediately
         document.addEventListener('plan-tab-changed', updateProBtn);
         
-        // If user is Pro, highlight their current plan tab on load
-        if (isPro && planType !== 'lifetime') {
-          selectProPlan(planType);
-        } else if (!isPro) {
-          selectProPlan('yearly'); // Default to yearly tab for non-pro
+        // Highlight the user's current plan tab on load
+        if (isPro) {
+          selectProPlan(planType); // monthly, yearly, OR lifetime
+        } else {
+          selectProPlan('yearly'); // Default to yearly tab for free users
         }
         updateProBtn();
       }
