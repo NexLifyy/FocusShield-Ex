@@ -403,9 +403,9 @@
           subPlanDesc.textContent = `Billed ${userPlanType}. Cancel anytime to return to the Free plan.`;
           btnCancelSub.style.display = 'inline-block';
           btnCancelSub.textContent = 'Cancel Subscription';
-          btnCancelSub.style.background = '';
-          btnCancelSub.style.color = '';
-          btnCancelSub.style.borderColor = '';
+          btnCancelSub.style.background = 'rgba(239, 68, 68, 0.1)';
+          btnCancelSub.style.color = '#ef4444';
+          btnCancelSub.style.borderColor = 'rgba(239, 68, 68, 0.2)';
           btnCancelSub.onclick = () => {
             showConfirmDialog('Cancel your Pro subscription? Access will continue until the end of your billing period.', async () => {
               btnCancelSub.textContent = 'Canceling...';
@@ -456,7 +456,7 @@
         }
 
         // Sync settings
-        syncStatus.textContent = 'Automatic cloud backup active (Pro)';
+        if (syncStatus) syncStatus.style.display = 'none';
         if (syncConnectionDesc) syncConnectionDesc.textContent = 'Connected & backing up changes automatically';
       } else {
         // Render Free status
@@ -468,7 +468,7 @@
         subCard.style.display = 'none';
         promoBanner.style.display = 'flex';
 
-        syncStatus.textContent = 'Automatic cloud backup active (Free)';
+        if (syncStatus) syncStatus.style.display = 'none';
         if (syncConnectionDesc) syncConnectionDesc.textContent = 'Settings and schedules synced to the cloud';
       }
 
