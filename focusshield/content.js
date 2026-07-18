@@ -2292,7 +2292,8 @@
                 uid: session.uid,
                 email: session.email,
                 fullName: session.fullName || '',
-                isPremium: !!session.isPremium
+                isPremium: !!session.isPremium,
+                accessToken: session.accessToken
               }
             }, () => {
               if (chrome.runtime.lastError) { /* ignore mismatch runtime errors */ }

@@ -7,6 +7,13 @@ const syncService = {
     const user = await authService.getCurrentUser();
     if (!user) return { success: false, error: 'User not signed in.' };
 
+    if (syncSupabaseClient && user.accessToken) {
+      await syncSupabaseClient.auth.setSession({
+        access_token: user.accessToken,
+        refresh_token: ''
+      });
+    }
+
     return new Promise((resolve) => {
       // Gather local settings
       chrome.storage.local.get([
@@ -61,10 +68,16 @@ const syncService = {
     });
   },
 
-  // Pull settings from cloud database and merge locally
   async restoreSettings() {
     const user = await authService.getCurrentUser();
     if (!user) return { success: false, error: 'User not signed in.' };
+
+    if (syncSupabaseClient && user.accessToken) {
+      await syncSupabaseClient.auth.setSession({
+        access_token: user.accessToken,
+        refresh_token: ''
+      });
+    }
 
     return new Promise((resolve) => {
       if (syncSupabaseClient) {

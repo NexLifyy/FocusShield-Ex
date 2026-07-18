@@ -78,7 +78,7 @@ const authService = {
         .maybeSingle();
 
       const isPremium = profile ? profile.is_premium : false;
-      const sessionUser = { email, isPremium, uid: data.user.id };
+      const sessionUser = { email, isPremium, uid: data.user.id, accessToken: data.session.access_token };
       await new Promise((resolve) => {
         chrome.storage.local.set({ sessionUser }, resolve);
       });
