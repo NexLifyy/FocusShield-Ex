@@ -3080,5 +3080,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // ── Listen for real-time updates from background worker ──
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'SETTINGS_UPDATED') {
+      console.log('[Popup] Settings/session updated in background, refreshing popup UI...');
+      chrome.storage.local.get(null, async (result) => {
+        settings = mergeWithDefaults(result);
+        await checkPremiumStatus();
+        updateAccountUI();
+        updateTrialBanner();
+        applySettingsToUI();
+        renderCustomSites();
+        renderSchedules();
+      });
+    }
+  });
 });
 
