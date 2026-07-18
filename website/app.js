@@ -70,17 +70,19 @@ document.addEventListener('DOMContentLoaded', () => {
           // Get premium status dynamically from database table
           const { data: profile } = await supabaseClient
             .from('profiles')
-            .select('is_premium')
+            .select('is_premium, plan_type')
             .eq('id', session.user.id)
             .maybeSingle();
 
           const isPremium = profile ? profile.is_premium : false;
+          const planType = profile && profile.plan_type ? profile.plan_type : 'yearly';
           
           const loggedUser = {
             uid: session.user.id,
             email: session.user.email,
             fullName: fullName,
             isPremium: isPremium,
+            planType: planType,
             accessToken: session.access_token,
             refreshToken: session.refresh_token
           };
@@ -197,17 +199,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get premium status from profile table
         const { data: profile } = await supabaseClient
           .from('profiles')
-          .select('is_premium')
+          .select('is_premium, plan_type')
           .eq('id', data.user.id)
           .maybeSingle();
 
         const isPremium = profile ? profile.is_premium : false;
+        const planType = profile && profile.plan_type ? profile.plan_type : 'yearly';
         const fullName = data.user.user_metadata ? (data.user.user_metadata.full_name || '') : '';
         const loggedUser = {
           uid: data.user.id,
           email: data.user.email,
           fullName: fullName,
           isPremium: isPremium,
+          planType: planType,
           accessToken: data.session.access_token,
           refreshToken: data.session.refresh_token
         };

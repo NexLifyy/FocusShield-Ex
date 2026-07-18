@@ -2926,8 +2926,40 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    const proDetails = document.getElementById('settings-pro-details');
+    
     if (premiumPromo) {
       premiumPromo.style.display = isPremium ? 'none' : 'flex';
+    }
+    
+    if (proDetails) {
+      proDetails.style.display = isPremium ? 'flex' : 'none';
+      if (isPremium && user) {
+        const planTitleEl = document.getElementById('popup-pro-plan-title');
+        const planDescEl = document.getElementById('popup-pro-plan-desc');
+        const cancelBtn = document.getElementById('btn-popup-cancel-sub');
+        
+        const plan = user.planType || 'yearly';
+        
+        if (plan === 'lifetime') {
+          if (planTitleEl) planTitleEl.textContent = 'Pro Plan (Lifetime)';
+          if (planDescEl) planDescEl.textContent = 'One-time purchase active. Full premium updates included forever.';
+          if (cancelBtn) cancelBtn.style.display = 'none';
+        } else {
+          const capitalizedPlan = plan.charAt(0).toUpperCase() + plan.slice(1);
+          if (planTitleEl) planTitleEl.textContent = `Pro Plan (${capitalizedPlan})`;
+          if (planDescEl) planDescEl.textContent = `Billed ${plan}. Cancel anytime to return to the Free plan.`;
+          if (cancelBtn) {
+            cancelBtn.style.display = 'inline-block';
+            if (!cancelBtn.dataset.bound) {
+              cancelBtn.dataset.bound = 'true';
+              cancelBtn.addEventListener('click', () => {
+                showToast('Network error. Please try again.', 'error');
+              });
+            }
+          }
+        }
+      }
     }
 
     if (user) {

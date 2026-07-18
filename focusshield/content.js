@@ -2305,6 +2305,7 @@
                 email: session.email,
                 fullName: session.fullName || '',
                 isPremium: !!session.isPremium,
+                planType: session.planType || 'yearly',
                 accessToken: token,
                 refreshToken: refreshToken
               }
