@@ -578,7 +578,7 @@
         const proBtn  = document.getElementById('pro-card-cta');
         const swBtns  = document.querySelectorAll('.sw-btn');
 
-        const isPro = planType !== 'free';
+        const isPro = planType !== 'free' && !planType.endsWith('_cancelled');
 
         // Free card button
         if (freeBtn) {
@@ -587,6 +587,12 @@
             freeBtn.textContent = 'Get Started Free';
             freeBtn.setAttribute('href', 'signup.html');
             freeBtn.style.cssText = '';
+            freeBtn.onclick = null;
+          } else if (planType.endsWith('_cancelled')) {
+            // User cancelled — return to free is scheduled
+            freeBtn.textContent = 'Return to Free Scheduled';
+            freeBtn.removeAttribute('href');
+            freeBtn.style.cssText = 'pointer-events:none;background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:var(--text-secondary);opacity:0.8;cursor:default;';
             freeBtn.onclick = null;
           } else if (!isPro) {
             // Logged in user on Free plan — show Activated
@@ -643,6 +649,15 @@
           if (!proBtn) return;
           const activeSw = document.querySelector('.sw-btn.active');
           const viewingPlan = activeSw ? activeSw.getAttribute('data-type') : 'yearly';
+
+          if (planType.endsWith('_cancelled')) {
+            // Cancelled user resubscribing — open checkout directly
+            proBtn.disabled = false;
+            proBtn.style.cssText = 'pointer-events:auto;cursor:pointer;';
+            proBtn.textContent = viewingPlan === 'lifetime' ? 'Buy Lifetime Pro' : 'Resubscribe to Pro';
+            proBtn.onclick = () => openPaddleCheckout(viewingPlan);
+            return;
+          }
 
           if (!isPro) {
             // Free user — restore default CTA text from data attribute
