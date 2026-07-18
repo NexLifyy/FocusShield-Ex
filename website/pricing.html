@@ -582,8 +582,14 @@
 
         // Free card button
         if (freeBtn) {
-          if (!isPro) {
-            // User is on free — show Activated
+          if (!userSession) {
+            // User is logged out — show Get Started Free
+            freeBtn.textContent = 'Get Started Free';
+            freeBtn.setAttribute('href', 'signup.html');
+            freeBtn.style.cssText = '';
+            freeBtn.onclick = null;
+          } else if (!isPro) {
+            // Logged in user on Free plan — show Activated
             freeBtn.textContent = 'Activated';
             freeBtn.removeAttribute('href');
             freeBtn.style.cssText = 'pointer-events:none;background:rgba(61,220,132,0.1);border-color:rgba(61,220,132,0.2);color:var(--accent);opacity:1;cursor:default;';
