@@ -3101,9 +3101,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set lastSeenSession so it doesn't trigger on reload again
         chrome.storage.local.set({ lastSeenSession: { uid: loggedUser.uid, isPremium: isPro } });
         showSyncModal('pro-login');
+        
         const res = await syncService.restoreSettings();
-        if (!res.success) {
-          console.warn('[Sync] Auto-restore on login failed:', res.error);
+        if (res.success) {
+          showToast('Settings restored from cloud!', 'success');
+        } else {
+          showToast('Restore failed: ' + res.error, 'error');
         }
 
         // Re-render settings and list limits
@@ -3111,6 +3114,7 @@ document.addEventListener('DOMContentLoaded', () => {
           settings = mergeWithDefaults(result);
           applySettingsToUI();
           renderCustomSites();
+          renderSchedules();
         });
       } catch (err) {
         showToast(err.message, 'error');
@@ -3139,6 +3143,7 @@ document.addEventListener('DOMContentLoaded', () => {
           settings = mergeWithDefaults(result);
           applySettingsToUI();
           renderCustomSites();
+          renderSchedules();
         });
       } catch (err) {
         showToast(err.message, 'error');
@@ -3174,6 +3179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             settings = mergeWithDefaults(result);
             applySettingsToUI();
             renderCustomSites();
+            renderSchedules();
           });
         });
       });
