@@ -776,9 +776,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (chrome.runtime.lastError) { /* ignore if popup is closed */ }
       });
 
-      // ── AUTO RESTORE SETTINGS IF PRO USER ──
-      if (message.session && message.session.isPremium) {
-        console.log('[Background] User is Premium. Automatically restoring cloud settings...');
+      // ── AUTO RESTORE SETTINGS IF LOGGED IN USER ──
+      if (message.session) {
+        console.log('[Background] User logged in. Automatically restoring cloud settings...');
         if (typeof syncService !== 'undefined') {
           syncService.restoreSettings().then((res) => {
             if (res.success) {

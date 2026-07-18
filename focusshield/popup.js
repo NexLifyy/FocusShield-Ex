@@ -467,14 +467,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           showSyncModal('free-logout');
         }
-      } else if ((!lastSeen.uid || lastSeen.uid !== current?.uid) && current && current.isPremium) {
-        // User logged in as premium
+      } else if ((!lastSeen.uid || lastSeen.uid !== current?.uid) && current) {
+        // User logged in
         showSyncModal('pro-login');
       }
     } else {
       // If lastSeen doesn't exist, this is first load after install/update
-      // If premium user is already logged in, show restoring data modal just in case
-      if (current && current.isPremium) {
+      // If user is already logged in, show restoring data modal just in case
+      if (current) {
         showSyncModal('pro-login');
       }
     }
@@ -554,9 +554,9 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       });
-      // ── AUTO BACKUP FOR PRO USERS ──
-      authService.isPremium().then((isPro) => {
-        if (isPro) {
+      // ── AUTO BACKUP FOR LOGGED IN USERS ──
+      authService.getCurrentUser().then((user) => {
+        if (user) {
           syncService.backupSettings().then((res) => {
             if (res.success) {
               console.log('[Sync] Auto-backed up settings successfully.');
@@ -2837,15 +2837,17 @@ document.addEventListener('DOMContentLoaded', () => {
       iconContainer.style.border = '1px solid rgba(244, 63, 94, 0.2)';
       iconContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19A3.5 3.5 0 0 0 21 15.5c0-2.79-2.54-4.5-5-4.5-.42-1.04-1.21-1.88-2.22-2.38"/><path d="M9.5 19H7a5 5 0 0 1-.5-9.98c.19-2.8 2.22-5 4.88-5c1.86 0 3.5 1.07 4.14 2.65"/><line x1="2" y1="2" x2="22" y2="22"/></svg>`;
       titleEl.textContent = 'Logged Out';
-      msgEl.textContent = 'You are logged out. Your data is not backed up. Upgrade to Pro!';
+      msgEl.textContent = 'You are logged out. Log in again to restore your settings, or upgrade to Pro for advanced features!';
 
-      const btnUpgrade = document.createElement('button');
-      btnUpgrade.className = 'btn-upgrade-paddle';
-      btnUpgrade.style.cssText = 'width: 100%; padding: 10px; background: linear-gradient(90deg, var(--accent), #56e29f); color: #000; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 11.5px;';
-      btnUpgrade.textContent = 'Upgrade to Pro';
-      btnUpgrade.onclick = () => {
+      const btnLogin = document.createElement('button');
+      btnLogin.className = 'btn-upgrade-paddle';
+      btnLogin.style.cssText = 'width: 100%; padding: 10px; background: linear-gradient(90deg, var(--accent), #56e29f); color: #000; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 11.5px;';
+      btnLogin.textContent = 'Log In Again';
+      btnLogin.onclick = () => {
         overlay.style.display = 'none';
-        showPaywall('site', 'Upgrade to Pro', 'Unlock cloud sync, custom schedules, and advanced blocking rules!');
+        showSubview('settings');
+        const overlayPaywall = document.getElementById('paywall-overlay');
+        if (overlayPaywall) overlayPaywall.style.display = 'flex';
       };
 
       const btnDismiss = document.createElement('button');
@@ -2856,7 +2858,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (onClose) onClose();
       };
 
-      actionsEl.appendChild(btnUpgrade);
+      actionsEl.appendChild(btnLogin);
       actionsEl.appendChild(btnDismiss);
 
     } else if (type === 'pro-login') {
@@ -3096,14 +3098,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAccountUI();
         updateTrialBanner();
         
-        if (isPro) {
-          // Set lastSeenSession so it doesn't trigger on reload again
-          chrome.storage.local.set({ lastSeenSession: { uid: loggedUser.uid, isPremium: true } });
-          showSyncModal('pro-login');
-          const res = await syncService.restoreSettings();
-          if (!res.success) {
-            console.warn('[Sync] Auto-restore on login failed:', res.error);
-          }
+        // Set lastSeenSession so it doesn't trigger on reload again
+        chrome.storage.local.set({ lastSeenSession: { uid: loggedUser.uid, isPremium: isPro } });
+        showSyncModal('pro-login');
+        const res = await syncService.restoreSettings();
+        if (!res.success) {
+          console.warn('[Sync] Auto-restore on login failed:', res.error);
         }
 
         // Re-render settings and list limits

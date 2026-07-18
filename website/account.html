@@ -423,7 +423,7 @@
         }
 
         // Sync settings
-        syncStatus.textContent = 'Automatic cloud backup active';
+        syncStatus.textContent = 'Automatic cloud backup active (Pro)';
         syncConnectionDesc.textContent = 'Connected & backing up changes automatically';
       } else {
         // Render Free status
@@ -435,16 +435,12 @@
         subCard.style.display = 'none';
         promoBanner.style.display = 'flex';
 
-        syncStatus.textContent = 'Cloud backup unavailable (Free)';
-        syncConnectionDesc.textContent = 'Connect with Pro Plan to sync extensions automatically';
+        syncStatus.textContent = 'Automatic cloud backup active (Free)';
+        syncConnectionDesc.textContent = 'Settings and schedules synced to the cloud';
       }
 
       // Sync button events
       document.getElementById('btn-force-sync').addEventListener('click', () => {
-        if (!isPremium) {
-          showNotification('Cloud Sync is a premium feature. Upgrade to Pro to backup automatically.', 'error');
-          return;
-        }
         lastSync.textContent = "Last Synced: Syncing...";
         setTimeout(() => {
           const now = new Date();
