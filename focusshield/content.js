@@ -2308,9 +2308,10 @@
       }
     }
     
-    // Check on load and periodically
+    // Check on load, periodically, and instantly on custom event
     syncSessionWithExtension();
     setInterval(syncSessionWithExtension, 1000);
+    window.addEventListener('focusshield-session-updated', syncSessionWithExtension);
   }
 
 })();

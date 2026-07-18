@@ -1,4 +1,21 @@
 // FocusShield Companion Website Interactivity & Auth Engine
+
+// Override localStorage methods to notify extension instantly of session changes
+const originalSetItem = localStorage.setItem;
+const originalRemoveItem = localStorage.removeItem;
+localStorage.setItem = function(key, value) {
+  originalSetItem.apply(this, arguments);
+  if (key === 'focusshield_mock_session') {
+    window.dispatchEvent(new CustomEvent('focusshield-session-updated'));
+  }
+};
+localStorage.removeItem = function(key) {
+  originalRemoveItem.apply(this, arguments);
+  if (key === 'focusshield_mock_session') {
+    window.dispatchEvent(new CustomEvent('focusshield-session-updated'));
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   // Parse redirect query parameter if present and store in sessionStorage
   const urlParams = new URLSearchParams(window.location.search);
