@@ -395,12 +395,29 @@
               btnCancelSub.textContent = 'Canceling...';
               btnCancelSub.disabled = true;
               try {
-                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                let token = null;
+                if (window.supabaseClient) {
+                  const { data } = await window.supabaseClient.auth.getSession();
+                  if (data && data.session) {
+                    token = data.session.access_token;
+                  }
+                }
+                if (!token && user) {
+                  token = user.accessToken;
+                }
+                
+                if (!token) {
+                  showNotification('Session missing. Please log in again.', 'error');
+                  btnCancelSub.textContent = 'Cancel Subscription';
+                  btnCancelSub.disabled = false;
+                  return;
+                }
+
                 const res = await fetch('https://evmbcpinujaufvwcxaaa.supabase.co/functions/v1/cancel-subscription', {
                   method: 'POST',
                   headers: {
                     'apikey': 'sb_publishable_FwqzwLUMWBAAmp6IG75ocQ_0BbOqr_D',
-                    'Authorization': `Bearer ${session.access_token}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                   }
                 });
