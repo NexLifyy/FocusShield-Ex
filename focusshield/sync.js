@@ -63,6 +63,7 @@ const syncService = {
       // Gather local settings
       chrome.storage.local.get([
         'customSites',
+        'hardBlockedSites',
         'schedules',
         'focusStats',
         'filterAdult',
@@ -79,7 +80,10 @@ const syncService = {
               .from('backups')
               .upsert({
                 user_id: user.uid,
-                custom_sites: data.customSites || [],
+                custom_sites: {
+                  list: data.customSites || [],
+                  hardBlocked: data.hardBlockedSites || []
+                },
                 schedules: data.schedules || [],
                 focus_stats: data.focusStats || {},
                 filter_adult: !!data.filterAdult,
@@ -154,8 +158,22 @@ const syncService = {
               resolve({ success: false, error: 'No cloud backups found.' });
             } else {
               // Map columns back to storage keys
+              const customSitesData = data.custom_sites;
+              let customSites = [];
+              let hardBlockedSites = [];
+              if (customSitesData) {
+                if (Array.isArray(customSitesData)) {
+                  // Legacy array support
+                  customSites = customSitesData;
+                } else if (typeof customSitesData === 'object') {
+                  customSites = customSitesData.list || [];
+                  hardBlockedSites = customSitesData.hardBlocked || [];
+                }
+              }
+
               const restoreData = {
-                customSites: data.custom_sites,
+                customSites: customSites,
+                hardBlockedSites: hardBlockedSites,
                 schedules: data.schedules,
                 focusStats: data.focus_stats,
                 filterAdult: data.filter_adult,
