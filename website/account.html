@@ -206,6 +206,51 @@
       }, 4000);
     }
 
+    // ── Custom Confirm Dialog Helper ──
+    function showConfirmDialog(message, onConfirm) {
+      let overlay = document.getElementById('confirm-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'confirm-overlay';
+        overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 11000; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s ease; pointer-events: none;';
+        document.body.appendChild(overlay);
+      }
+      
+      overlay.innerHTML = `
+        <div style="background: #121212; border: 1px solid var(--border); border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 16px; transform: scale(0.95); transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+          <h4 style="font-family: var(--font-headings); font-size: 18px; font-weight: 700; color: #fff; margin: 0;">Confirm Action</h4>
+          <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin: 0;">${message}</p>
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px;">
+            <button id="confirm-cancel-btn" class="btn btn-secondary" style="font-size: 13px; padding: 8px 16px; cursor: pointer;">Cancel</button>
+            <button id="confirm-ok-btn" class="btn btn-primary" style="font-size: 13px; padding: 8px 16px; color: #000; cursor: pointer;">Confirm</button>
+          </div>
+        </div>
+      `;
+      
+      const modal = overlay.firstElementChild;
+      
+      overlay.style.pointerEvents = 'auto';
+      overlay.style.opacity = '1';
+      setTimeout(() => {
+        modal.style.transform = 'scale(1)';
+      }, 50);
+      
+      const closeDialog = () => {
+        modal.style.transform = 'scale(0.95)';
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+      };
+      
+      document.getElementById('confirm-cancel-btn').onclick = () => {
+        closeDialog();
+      };
+      
+      document.getElementById('confirm-ok-btn').onclick = () => {
+        closeDialog();
+        onConfirm();
+      };
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       // If we have a hash parameter in URL (e.g. access_token from OAuth), wait for session resolution
       if (window.location.hash || window.location.href.includes('error=')) {
@@ -345,30 +390,31 @@
           subPlanTitle.textContent = `Pro Plan (${capitalizedPlan})`;
           subPlanDesc.textContent = `Billed ${userPlanType}ly. Cancel anytime to return to the Free plan.`;
           btnCancelSub.style.display = 'inline-block';
-          btnCancelSub.onclick = async () => {
-            if (!confirm('Cancel your Pro subscription? Access will continue until the end of your billing period.')) return;
-            btnCancelSub.textContent = 'Canceling...';
-            btnCancelSub.disabled = true;
-            try {
-              const { data: { session } } = await window.supabaseClient.auth.getSession();
-              const res = await fetch('https://evmbcpinujaufvwcxaaa.supabase.co/functions/v1/cancel-subscription', {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' }
-              });
-              const result = await res.json();
-              if (res.ok) {
-                showNotification('Subscription canceled. Return to free plan scheduled.', 'success');
-                setTimeout(() => window.location.reload(), 2500);
-              } else {
-                showNotification('Error: ' + (result.message || 'Could not cancel subscription.'), 'error');
+          btnCancelSub.onclick = () => {
+            showConfirmDialog('Cancel your Pro subscription? Access will continue until the end of your billing period.', async () => {
+              btnCancelSub.textContent = 'Canceling...';
+              btnCancelSub.disabled = true;
+              try {
+                const { data: { session } } = await window.supabaseClient.auth.getSession();
+                const res = await fetch('https://evmbcpinujaufvwcxaaa.supabase.co/functions/v1/cancel-subscription', {
+                  method: 'POST',
+                  headers: { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' }
+                });
+                const result = await res.json();
+                if (res.ok) {
+                  showNotification('Subscription canceled. Return to free plan scheduled.', 'success');
+                  setTimeout(() => window.location.reload(), 2500);
+                } else {
+                  showNotification('Error: ' + (result.message || 'Could not cancel subscription.'), 'error');
+                  btnCancelSub.textContent = 'Cancel Subscription';
+                  btnCancelSub.disabled = false;
+                }
+              } catch(e) {
+                showNotification('Network error. Please try again.', 'error');
                 btnCancelSub.textContent = 'Cancel Subscription';
                 btnCancelSub.disabled = false;
               }
-            } catch(e) {
-              showNotification('Network error. Please try again.', 'error');
-              btnCancelSub.textContent = 'Cancel Subscription';
-              btnCancelSub.disabled = false;
-            }
+            });
           };
         }
 
@@ -408,10 +454,10 @@
           showNotification('Backup management is a premium feature.', 'error');
           return;
         }
-        if (confirm("Are you sure you want to delete your settings cloud backup? This cannot be undone.")) {
+        showConfirmDialog('Are you sure you want to delete your settings cloud backup? This cannot be undone.', () => {
           showNotification('Cloud sync backup cleared successfully.', 'success');
           lastSync.textContent = "Last Synced: Never";
-        }
+        });
       });
     });
   </script>
