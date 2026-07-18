@@ -2957,6 +2957,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loggedOutCard = document.getElementById('account-logged-out-card');
     const loggedInCard = document.getElementById('account-logged-in-card');
     const promoCard = document.getElementById('account-premium-promo-card');
+    const cloudBackupCard = document.getElementById('settings-cloud-backup-card');
     
     const settingsAccountStatus = document.getElementById('settings-account-status');
     const settingsAccountTitle = document.getElementById('settings-account-title');
@@ -3014,6 +3015,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (user) {
       if (loggedOutCard) loggedOutCard.style.display = 'none';
       if (loggedInCard) loggedInCard.style.display = 'flex';
+      if (cloudBackupCard) cloudBackupCard.style.setProperty('display', 'flex', 'important');
       
       const emailEl = document.getElementById('account-email');
       if (emailEl) emailEl.textContent = user.fullName || user.email;
@@ -3111,6 +3113,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (loggedOutCard) loggedOutCard.style.display = 'flex';
       if (loggedInCard) loggedInCard.style.display = 'none';
       if (promoCard) promoCard.style.display = isPremium ? 'none' : 'flex';
+      if (cloudBackupCard) cloudBackupCard.style.setProperty('display', 'none', 'important');
       
       if (settingsAccountTitle) {
         settingsAccountTitle.textContent = 'Login / Sign Up';
