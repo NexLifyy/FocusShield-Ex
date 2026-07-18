@@ -309,7 +309,7 @@
       <h3>Start focusing <em>today</em></h3>
       <p>Join thousands of professionals who take their focus seriously. Begin free, upgrade whenever you are ready.</p>
       <div class="upgrade-btns">
-        <a href="signup.html" class="btn btn-primary" style="padding:14px 36px;font-size:15px;">Start 7-Day Free Trial</a>
+        <a href="signup.html" class="btn btn-primary checkout-btn" data-plan-type="yearly" style="padding:14px 36px;font-size:15px;">Start 7-Day Free Trial</a>
       </div>
     </div>
   </div>
@@ -792,7 +792,8 @@
       }
 
       document.querySelectorAll('.checkout-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
           const planType = btn.getAttribute('data-plan-type') || 'yearly';
           openPaddleCheckout(planType);
         });
