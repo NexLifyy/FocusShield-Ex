@@ -791,7 +791,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 });
               });
             } else {
-              console.warn('[Background] Auto-restore failed:', res.error);
+              if (res.error === 'No cloud backups found.') {
+                console.log('[Background] No cloud backup found. Creating first-time cloud backup...');
+                syncService.backupSettings().then((backupRes) => {
+                  if (backupRes.success) {
+                    console.log('[Background] First-time cloud backup created successfully.');
+                  } else {
+                    console.warn('[Background] First-time cloud backup failed:', backupRes.error);
+                  }
+                });
+              } else {
+                console.warn('[Background] Auto-restore failed:', res.error);
+              }
             }
           }).catch(err => {
             console.error('[Background] Error running restoreSettings:', err);

@@ -3106,7 +3106,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (res.success) {
           showToast('Settings restored from cloud!', 'success');
         } else {
-          showToast('Restore failed: ' + res.error, 'error');
+          if (res.error === 'No cloud backups found.') {
+            showToast('Creating first cloud backup...', 'info');
+            const backupRes = await syncService.backupSettings();
+            if (backupRes.success) {
+              showToast('Local settings backed up to cloud!', 'success');
+            } else {
+              showToast('Backup failed: ' + backupRes.error, 'error');
+            }
+          } else {
+            showToast('Restore failed: ' + res.error, 'error');
+          }
         }
 
         // Re-render settings and list limits
