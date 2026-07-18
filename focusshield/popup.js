@@ -3004,7 +3004,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!cancelBtn.dataset.bound) {
               cancelBtn.dataset.bound = 'true';
               cancelBtn.addEventListener('click', () => {
-                if (confirm('Cancel your Pro subscription? You will keep Pro access until the end of your billing period.')) {
+                const currentText = cancelBtn.textContent.trim();
+                if (currentText === 'Cancel') {
+                  cancelBtn.textContent = 'Confirm?';
+                  cancelBtn.style.background = '#ef4444';
+                  cancelBtn.style.color = '#ffffff';
+                  cancelBtn.style.borderColor = '#ef4444';
+                  
+                  cancelBtn.timeoutId = setTimeout(() => {
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.style.background = 'rgba(239, 68, 68, 0.1)';
+                    cancelBtn.style.color = '#ef4444';
+                    cancelBtn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                  }, 3000);
+                } else if (currentText === 'Confirm?') {
+                  if (cancelBtn.timeoutId) clearTimeout(cancelBtn.timeoutId);
+                  
                   cancelBtn.textContent = 'Canceling...';
                   cancelBtn.disabled = true;
                   
@@ -3020,9 +3035,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     const result = await res.json();
                     cancelBtn.textContent = 'Cancel';
                     cancelBtn.disabled = false;
+                    cancelBtn.style.background = 'rgba(239, 68, 68, 0.1)';
+                    cancelBtn.style.color = '#ef4444';
+                    cancelBtn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
                     
                     if (res.ok) {
                       showToast('Subscription canceled. Pro access continues until end of billing period.', 'success');
+                      setTimeout(() => {
+                        updateAccountUI();
+                      }, 1500);
                     } else {
                       showToast(result.message || 'Could not cancel subscription.', 'error');
                     }
@@ -3030,6 +3051,9 @@ document.addEventListener('DOMContentLoaded', () => {
                   .catch((err) => {
                     cancelBtn.textContent = 'Cancel';
                     cancelBtn.disabled = false;
+                    cancelBtn.style.background = 'rgba(239, 68, 68, 0.1)';
+                    cancelBtn.style.color = '#ef4444';
+                    cancelBtn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
                     showToast('Network error. Please try again.', 'error');
                   });
                 }
