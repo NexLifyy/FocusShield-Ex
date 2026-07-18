@@ -71,7 +71,13 @@ const syncService = {
         'filterShopping',
         'filterGambling',
         'filterStreaming',
-        'previousPlatformStates'
+        'previousPlatformStates',
+        'youtube',
+        'facebook',
+        'instagram',
+        'reddit',
+        'tiktok',
+        'twitter'
       ], async (data) => {
         if (syncSupabaseClient) {
           // Live Supabase sync logic
@@ -91,7 +97,17 @@ const syncService = {
                 filter_shopping: !!data.filterShopping,
                 filter_gambling: !!data.filterGambling,
                 filter_streaming: !!data.filterStreaming,
-                previous_platform_states: data.previousPlatformStates || {},
+                previous_platform_states: {
+                  history: data.previousPlatformStates || {},
+                  activePlatforms: {
+                    youtube: data.youtube || {},
+                    facebook: data.facebook || {},
+                    instagram: data.instagram || {},
+                    reddit: data.reddit || {},
+                    tiktok: data.tiktok || {},
+                    twitter: data.twitter || {}
+                  }
+                },
                 updated_at: new Date().toISOString()
               });
 
@@ -171,6 +187,31 @@ const syncService = {
                 }
               }
 
+              const prevStatesData = data.previous_platform_states;
+              let previousPlatformStates = {};
+              let youtube = {};
+              let facebook = {};
+              let instagram = {};
+              let reddit = {};
+              let tiktok = {};
+              let twitter = {};
+
+              if (prevStatesData) {
+                if (prevStatesData.activePlatforms) {
+                  // New packaged format
+                  previousPlatformStates = prevStatesData.history || {};
+                  youtube = prevStatesData.activePlatforms.youtube || {};
+                  facebook = prevStatesData.activePlatforms.facebook || {};
+                  instagram = prevStatesData.activePlatforms.instagram || {};
+                  reddit = prevStatesData.activePlatforms.reddit || {};
+                  tiktok = prevStatesData.activePlatforms.tiktok || {};
+                  twitter = prevStatesData.activePlatforms.twitter || {};
+                } else {
+                  // Legacy format
+                  previousPlatformStates = prevStatesData;
+                }
+              }
+
               const restoreData = {
                 customSites: customSites,
                 hardBlockedSites: hardBlockedSites,
@@ -181,8 +222,16 @@ const syncService = {
                 filterShopping: data.filter_shopping,
                 filterGambling: data.filter_gambling,
                 filterStreaming: data.filter_streaming,
-                previousPlatformStates: data.previous_platform_states
+                previousPlatformStates: previousPlatformStates
               };
+
+              if (Object.keys(youtube).length > 0) restoreData.youtube = youtube;
+              if (Object.keys(facebook).length > 0) restoreData.facebook = facebook;
+              if (Object.keys(instagram).length > 0) restoreData.instagram = instagram;
+              if (Object.keys(reddit).length > 0) restoreData.reddit = reddit;
+              if (Object.keys(tiktok).length > 0) restoreData.tiktok = tiktok;
+              if (Object.keys(twitter).length > 0) restoreData.twitter = twitter;
+
               chrome.storage.local.set(restoreData, () => {
                 resolve({ success: true });
               });
