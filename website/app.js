@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return user;
     },
 
-    async upgradeToPremium(customEmail = null) {
+    async upgradeToPremium(customEmail = null, planType = 'yearly') {
       const user = this.getCurrentUser();
       const emailTarget = customEmail || (user ? user.email : null);
       if (!emailTarget) return;
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (supabaseClient && user && user.email === emailTarget) {
         const { error } = await supabaseClient
           .from('profiles')
-          .update({ is_premium: true })
+          .update({ is_premium: true, plan_type: planType })
           .eq('id', user.uid);
         
         if (error) console.error('[Supabase] Profile upgrade failed:', error);
@@ -315,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Sync local session & mock users list
       if (user && user.email === emailTarget) {
         user.isPremium = true;
+        user.planType = planType;
         localStorage.setItem('focusshield_mock_session', JSON.stringify(user));
         this.broadcastSession(user);
       }
@@ -324,6 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const userIdx = users.findIndex(u => u.email === emailTarget);
       if (userIdx !== -1) {
         users[userIdx].isPremium = true;
+        users[userIdx].planType = planType;
         this.saveUsers(users);
       } else if (!user) {
         // Create user if checkout occurred without logged in session
@@ -331,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
           uid: 'web-uid-' + Math.random().toString(36).substr(2, 9),
           email: emailTarget,
           isPremium: true,
+          planType: planType,
           backups: []
         };
         users.push(newUser);

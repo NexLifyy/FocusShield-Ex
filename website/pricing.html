@@ -726,8 +726,14 @@
           eventCallback: function(data) {
             if (data.name === 'checkout.completed') {
               const email = (data.data && data.data.customer && data.data.customer.email) || (userSession ? userSession.user.email : '');
+              const priceId = (data.data && data.data.items && data.data.items[0] && data.data.items[0].price) ? data.data.items[0].price.id : null;
+              let planType = 'yearly';
+              if (priceId === 'pri_01kxrkpy9smm7aknsyzwfs6fws') planType = 'monthly';
+              else if (priceId === 'pri_01kxrkr5p6f3mz1eghb3qn18hv') planType = 'yearly';
+              else if (priceId === 'pri_01kxrks7p2r4g8wee3kmkvx9f3') planType = 'lifetime';
+              
               if (window.authEngine && email) {
-                window.authEngine.upgradeToPremium(email).then(() => {
+                window.authEngine.upgradeToPremium(email, planType).then(() => {
                   if (successModal) successModal.style.display = 'flex';
                 });
               } else if (successModal) {
