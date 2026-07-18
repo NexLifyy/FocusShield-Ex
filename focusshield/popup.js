@@ -820,18 +820,28 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('[Sync] Failed to delete cloud backup:', res.error);
           }
           
-          chrome.storage.local.clear(() => {
-            chrome.storage.local.set(defaultSettings, () => {
-              showToast('All FocusShield data deleted', 'success');
-              settings = mergeWithDefaults(defaultSettings);
-              applySettingsToUI();
-              renderInsights();
-              renderSchedules();
+          chrome.storage.local.get(['sessionUser'], (result) => {
+            const preservedSession = result.sessionUser || null;
+            
+            chrome.storage.local.clear(() => {
+              const newSettings = { ...defaultSettings };
+              if (preservedSession) {
+                newSettings.sessionUser = preservedSession;
+              }
               
-              btnClearStats.textContent = 'Delete';
-              btnClearStats.style.background = 'rgba(239, 68, 68, 0.12)';
-              btnClearStats.style.color = '#ef4444';
-              btnClearStats.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+              chrome.storage.local.set(newSettings, () => {
+                showToast('All FocusShield data deleted', 'success');
+                settings = mergeWithDefaults(newSettings);
+                applySettingsToUI();
+                renderInsights();
+                renderSchedules();
+                updateAccountUI();
+                
+                btnClearStats.textContent = 'Delete';
+                btnClearStats.style.background = 'rgba(239, 68, 68, 0.12)';
+                btnClearStats.style.color = '#ef4444';
+                btnClearStats.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+              });
             });
           });
         });
