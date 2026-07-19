@@ -739,11 +739,10 @@
 
 
 
-      // Initialize Paddle Billing API — sandbox environment MUST be set before Initialize
+      // Initialize Paddle Billing API — live production environment
       try {
-        Paddle.Environment.set('sandbox');
         Paddle.Initialize({
-          token: 'test_5a6451b88aa7a5e5856b7f521b3',
+          token: 'live_a3fb024adb1c905d1542fc00d1f',
           eventCallback: function(data) {
             if (data.name === 'checkout.completed') {
               const email = (data.data && data.data.customer && data.data.customer.email) || (userSession ? userSession.user.email : '');
@@ -764,9 +763,9 @@
       }
 
       const priceMap = {
-        monthly: 'pri_01kxrkpy9smm7aknsyzwfs6fws',
-        yearly: 'pri_01kxrkr5p6f3mz1eghb3qn18hv',
-        lifetime: 'pri_01kxrks7p2r4g8wee3kmkvx9f3'
+        monthly: 'pri_01kx8ac5k6cb7gs7bvx9p5ptx4',
+        yearly: 'pri_01kxffqj844cys69msa4ewxmhb',
+        lifetime: 'pri_01kxffsjv25m9zd7eyzj4h1c9r'
       };
 
       // Get live Supabase session (not just localStorage mock session)
