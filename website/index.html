@@ -1835,7 +1835,7 @@
   </footer>
 
   <script src="supabase.js?v=2"></script>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=9"></script>
   <script>
     (function(){
       var toggle = document.getElementById('nav-toggle');
@@ -1876,16 +1876,6 @@
         if (mockFilter) mockFilter.style.display = 'block';
       });
     }
-
-    // FAQ accordion
-    document.querySelectorAll('.faq-question').forEach(q => {
-      q.addEventListener('click', () => {
-        const item = q.parentElement;
-        const isOpen = item.classList.contains('active');
-        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
-        if (!isOpen) item.classList.add('active');
-      });
-    });
   </script>
 </body>
 </html>
