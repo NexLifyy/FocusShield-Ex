@@ -112,10 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.reload();
           }
         } else if (event === 'SIGNED_OUT') {
-          localStorage.removeItem('focusshield_mock_session');
-          if (window.authEngine && window.authEngine.broadcastSession) {
-            window.authEngine.broadcastSession(null);
-          }
+          // Do not automatically clear the mock session on auto-logout or initial check.
+          // User logout is explicitly handled by window.authEngine.logout().
+          console.log('[FocusShield] Supabase SIGNED_OUT event received. Retaining mock session.');
         }
       });
     } catch (e) {
@@ -303,13 +302,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const emailTarget = customEmail || (user ? user.email : null);
       if (!emailTarget) return;
 
-      if (supabaseClient && user) {
-        const { error } = await supabaseClient
-          .from('profiles')
-          .update({ is_premium: true, plan_type: planType })
-          .eq('id', user.uid);
+      if (supabaseClient) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const activeUid = session ? session.user.id : (user ? user.uid : null);
         
-        if (error) console.error('[Supabase] Profile upgrade failed:', error);
+        if (activeUid) {
+          const { error } = await supabaseClient
+            .from('profiles')
+            .update({ is_premium: true, plan_type: planType })
+            .eq('id', activeUid);
+          
+          if (error) console.error('[Supabase] Profile upgrade failed:', error);
+        }
       }
 
       // Sync local session & mock users list
